@@ -1,0 +1,30 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "RuntimeModelImport",
+	"Description": "runtime model import",
+	"Category": "Other",
+	"CreatedBy": "fengy-f",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "RuntimeModelImport",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+  "Plugins": [
+		{
+			"Name": "RuntimeMeshComponent",
+			"Enabled": true
+		}
+  ]
+}

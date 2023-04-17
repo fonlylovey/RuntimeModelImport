@@ -1,0 +1,8 @@
+{
+	"BuildId": "23058290",
+	"Modules": 
+	{
+		"RuntimeMeshComponent": "UnrealEditor-RuntimeMeshComponent.dll",
+		"RuntimeMeshComponentEditor": "UnrealEditor-RuntimeMeshComponentEditor.dll"
+	}
+}

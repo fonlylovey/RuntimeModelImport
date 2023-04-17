@@ -1,0 +1,9 @@
+#include "RMIDelegates.h"
+
+FRMIDelegates::FOnImportStartDelegate FRMIDelegates::OnImportStartDelegate;
+FRMIDelegates::FOnMeshTreeBuildFinishDelegate FRMIDelegates::OnMeshTreeBuildFinishDelegate;
+FRMIDelegates::FOnSpawnActorFinishDelegate FRMIDelegates::OnSpawnActorFinishDelegate;
+
+
+FRMIDelegates::FOnImportProgressDelegate FRMIDelegates::OnImportProgressDelegate;
+FRMIDelegates::FOnImportCompleteDelegate FRMIDelegates::OnImportCompleteDelegate;

@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{4B0C3774-44A4-8D95-C3FE-69ADC66E2067}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "ModelDB",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
