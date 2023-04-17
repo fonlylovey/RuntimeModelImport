@@ -1,8 +1,0 @@
-{
-	"BuildId": "b88e8fc6-817a-4f76-b2ce-0fe149991f8a",
-	"Modules": 
-	{
-		"RuntimeMeshComponent": "UnrealEditor-RuntimeMeshComponent-Win64-DebugGame.dll",
-		"RuntimeMeshComponentEditor": "UnrealEditor-RuntimeMeshComponentEditor-Win64-DebugGame.dll"
-	}
-}
