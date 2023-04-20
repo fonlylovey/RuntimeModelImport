@@ -18,9 +18,15 @@ class RUNTIMEMODELIMPORT_API ARuntimeActor : public ARuntimeMeshActor
 public:
 	ARuntimeActor(const FObjectInitializer& Init);
 
+	virtual void BeginPlay() override;
+
+	virtual void BeginDestroy() override;
+
+	virtual void Tick(float DeltaTime) override;
+
 	//给Actor设置渲染的Mesh数据
-	void SetModelMesh(FModelMesh* mesh);
-	FModelMesh* GetModelMesh() { return ModelMesh; };
+	void SetModelMesh(TSharedPtr<FModelMesh> mesh);
+	FModelMesh* GetModelMesh() { return ModelMesh.Get(); };
 
 	void SetMaterialSlot(int32 MaterialSlot, FName SlotName, UMaterialInterface* InMaterial);
 
@@ -31,11 +37,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	ARuntimeActor* GetRootActor();
-
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	virtual void Tick(float DeltaTime) override;
 
 	void Init(FModelMesh* mesh);
 
@@ -60,7 +61,7 @@ private:
 	FBoxSphereBounds BoundingSphere;
 	FString ActorName;
 	bool IsRoot;
-	FModelMesh* ModelMesh;
+	TSharedPtr<FModelMesh> ModelMesh;
 	FActorSpawnParameters SpawnInfo;
 	FCriticalSection Mutex;
 	UPROPERTY()

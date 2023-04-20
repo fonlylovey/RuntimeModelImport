@@ -20,12 +20,7 @@ ARuntimeActor::ARuntimeActor(const FObjectInitializer& Init)
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 }
 
-void ARuntimeActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-}
-
-void ARuntimeActor::SetModelMesh(FModelMesh* mesh)
+void ARuntimeActor::SetModelMesh(TSharedPtr<FModelMesh> mesh)
 {
 	ModelMesh = mesh;
 	ActorName = mesh->MeshName;
@@ -38,7 +33,7 @@ void ARuntimeActor::SetModelMesh(FModelMesh* mesh)
 	meshCount = mesh->GetChildrenNum();;
 
 	SetActorTransform(ModelMesh->MeshMatrix);
-	traverseMeshTree(mesh, this);
+	traverseMeshTree(mesh.Get(), this);
 }
 
 void ARuntimeActor::Init(FModelMesh* mesh)
@@ -82,7 +77,7 @@ void ARuntimeActor::Init(FModelMesh* mesh)
 		//	{
 				++readIndex;
 				FString strInfo = TEXT("生成Actor: " + mesh->MeshName);
-				FRMIDelegates::OnImportProgressDelegate.Broadcast(1, readIndex, meshCount, strInfo);
+				FRMIDelegates::OnImportProgressDelegate.Broadcast(1, readIndex, meshCount, MoveTemp(strInfo));
 
 				if (readIndex >= meshCount)
 				{
@@ -96,12 +91,10 @@ void ARuntimeActor::Init(FModelMesh* mesh)
 
 void ARuntimeActor::AsyncInit(FModelMesh* mesh)
 {
-	//auto lambda = ;
-	//Async(EAsyncExecution::ThreadPool, [&, mesh]() {
+	Async(EAsyncExecution::ThreadPool, [&, mesh]()
+		{
 		Init(mesh);
-	//	});
-	//AsyncPool(*FQueuedThreadPool::Allocate(), lambda, nullptr, EQueuedWorkPriority::High);
-	//GEKThread::GetPoolTask().CreateAsyncLambda(lambda);
+		});
 }
 
 void ARuntimeActor::traverseMeshTree(FModelMesh* mesh, AActor* pParent)
@@ -154,19 +147,20 @@ void ARuntimeActor::traverseActor(ARuntimeActor* rootActor)
 UMaterialInterface* ARuntimeActor::CreateMaterial(FModelMaterial& mat)
 {
 	//此处有个析构的问题待解决, 先用这个方法检测一下是否崩溃
-	FSoftObjectPath matPath;
+	FSoftObjectPath softPath;
 	UMaterialInstanceDynamic* dynamicMaterial = nullptr;
 	if (mat.Opacity == 1.0)
 	{
-		matPath = FSoftObjectPath(RMI_DEFAULTMAT);
+		softPath = FSoftObjectPath(RMI_DEFAULTMAT);
 	}
 	else
 	{
-		matPath = FSoftObjectPath(RMI_TRANSPARENTMAT);
+		softPath = FSoftObjectPath(RMI_TRANSPARENTMAT);
 	}
-	UObject* itemObj = matPath.ResolveObject();
+
+	UObject* itemObj = softPath.TryLoad();
 	UMaterialInterface* baseMaterial = Cast<UMaterialInterface>(itemObj);
-	dynamicMaterial = UMaterialInstanceDynamic::Create(baseMaterial, nullptr, FName(mat.Name));
+	dynamicMaterial = UMaterialInstanceDynamic::Create(baseMaterial, this, FName(mat.Name));
 
 	if (!dynamicMaterial)
 		return nullptr;
@@ -230,6 +224,12 @@ ARuntimeActor* ARuntimeActor::GetRootActor()
 void ARuntimeActor::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ARuntimeActor::BeginDestroy()
+{
+	Super::BeginDestroy();
+	ModelMesh.Reset();
 }
 
 void ARuntimeActor::Tick(float DeltaTime)

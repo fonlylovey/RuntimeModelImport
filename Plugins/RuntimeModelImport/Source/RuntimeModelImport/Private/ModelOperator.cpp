@@ -1,4 +1,4 @@
-#include "ModelOperator.h"
+﻿#include "ModelOperator.h"
 #include "OBJReader.h"
 #include "IFCReader.h"
 #include "FBXReader.h"
@@ -7,7 +7,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "RMIDelegates.h"
-#include "../SaveGame/ModelSaveGame.h"
+#include "Engine/World.h"
 
 FModelOperator* FModelOperator::s_pSelf = nullptr;
 
@@ -16,7 +16,7 @@ FModelOperator::FOnSpawnCompleteDelegate FModelOperator::OnSpawnComplete;
 FModelOperator::FModelOperator()
 {
 	m_pSaveModelPtr = MakeShared<FModelSaveSystem>();
-	//����Mesh��״�ṹ���
+	//监听Mesh树状结构完成
 	FRMIDelegates::OnMeshTreeBuildFinishDelegate.Clear();
 	FRMIDelegates::OnMeshTreeBuildFinishDelegate.AddRaw(this, &FModelOperator::OnMeshTreeBuildFinishDelegateListen);
 }
@@ -34,7 +34,7 @@ ARuntimeActor* FModelOperator::ReadModelFile(const FString& strPath, const FImpo
 		m_option = options;
 		m_pModelActor = GWorld->SpawnActor<ARuntimeActor>(ARuntimeActor::StaticClass(), FVector(0, 0, 0), FRotator(0, 0, 0));
 
-		//����һ���µ�ģ�Ͷ�ȡ��
+		//创建一个新的模型读取者
 		FString strSuffix = GetSuffix(strPath);
 		m_pReader = CreateReader(strSuffix);
 		FRMIDelegates::OnImportStartDelegate.Broadcast(strPath);
@@ -53,21 +53,37 @@ void FModelOperator::SaveModel(const FString& saveDir, ARuntimeActor* actor)
 
 void FModelOperator::LoadModel(const FString& fileDir)
 {
-	auto loadComplete = [this](TArray<TSharedPtr<FModelMesh>> modelList)
+	auto loadComplete = [this](const TArray<TSharedPtr<FModelMesh>>& modelList)
 	{
 		ActorList.Empty();
 		for (TSharedPtr<FModelMesh> meshPtr : modelList)
 		{
-			auto world = GWorld;
-			check(world != nullptr);
-			ARuntimeActor* actor = world->SpawnActor<ARuntimeActor>(ARuntimeActor::StaticClass(), FVector(0, 0, 0), FRotator(0, 0, 0));
+			UWorld* GameWorld = GWorld;
+			auto gEngine = GEngine;
+			auto worldList = gEngine->GetWorldContexts();
+			if(GameWorld->WorldType == EWorldType::Editor)
+			{
+				for (auto theWorld : worldList)
+				{
+					if(theWorld.WorldType != EWorldType::Editor)
+					{
+						GameWorld = theWorld.World();
+					}
+				}
+			}
+			check(GameWorld != nullptr);
+			ARuntimeActor* actor = GameWorld->SpawnActorDeferred<ARuntimeActor>(ARuntimeActor::StaticClass(),
+				meshPtr->MeshMatrix);
 			actor->GUID = meshPtr->MeshGUID;
-			actor->SetModelMesh(meshPtr.Get());
+			actor->SetModelMesh(meshPtr);
 			ActorList.Add(actor);
-			OnSpawnComplete.Broadcast(ActorList);
 		}
+		//在这里MeshPtr的引用计数已经增加，清空数组不会在析构MehsPtr，将控制权移交给Actor
+		m_pSaveModelPtr->MeshList.Empty();
+		OnSpawnComplete.Broadcast(ActorList);
 	};
-
+	
+	m_pSaveModelPtr->OnLoadComplete.Clear();
 	m_pSaveModelPtr->OnLoadComplete.AddLambda(loadComplete);
 	m_pSaveModelPtr->LoadByFile(fileDir);
 	
@@ -106,18 +122,12 @@ FModelOperator* FModelOperator::Instance()
 	return s_pSelf;
 }
 
-void FModelOperator::Destruct()
-{
-	delete s_pSelf;
-	s_pSelf = nullptr;
-}
-
 void FModelOperator::OnMeshTreeBuildFinishDelegateListen(FModelMesh* pRoot)
 {
 	if (!pRoot)
 		return;
 	pRoot->MeshGUID = FGuid::NewGuid().ToString();
-	m_pModelActor->SetModelMesh(pRoot);
+	m_pModelActor->SetModelMesh(MakeShareable(pRoot));
 	m_pModelActor->GUID = pRoot->MeshGUID;
 	FRMIDelegates::OnImportCompleteDelegate.Broadcast(m_pModelActor);
 }

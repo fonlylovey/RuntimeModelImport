@@ -30,7 +30,7 @@ FModelMesh* FBXMeshImport::LoadMesh(FbxScene* scene)
 		m_pRootMesh->IsRoot = true;
 		MeshList.Add(m_pRootMesh);
 		traverseNode(rootNode, m_pRootMesh);
-
+		MatIndexSet.Num();
 		return m_pRootMesh;
 	}
 	return m_pRootMesh;
@@ -172,25 +172,31 @@ void FBXMeshImport::readMesh(FbxNode* pNode, FModelMesh* pMesh)
 		//将Section的大小设置为材质数量的大小
 		pMesh->SectionList.Reset(matCount);
 
+		TMap<int, TSharedPtr<FRuntimeMeshSectionData>> MatIndexSectionMap;
 		//挨个读取多边形
 		for (int i = 0; i < triangleCount; i++)
 		{
 			//获取当前多边形所使用的材质索引[0, matCount]
 			const int matIndex = indexArray[i];
-
-			//按照材质索引获取或者创建Section
-			TSharedPtr<FRuntimeMeshSectionData> pSection = nullptr;
-			if (pMesh->SectionList.Num() > matIndex)
+			if(matIndex == 0)
 			{
-				pSection = pMesh->SectionList[matIndex];
+				int a = 0;
+			}
+			//按照材质索引获取或者创建Section   pMesh->SectionList.Num() > matIndex
+			TSharedPtr<FRuntimeMeshSectionData> pSection = nullptr;
+			if (MatIndexSectionMap.Contains(matIndex))
+			{
+				pSection = MatIndexSectionMap[matIndex];
 			}
 			else
 			{
+				
 				pSection = MakeShared<FRuntimeMeshSectionData>();
 				pSection->MeshData.Triangles = FRuntimeMeshTriangleStream(true);
 				pSection->MeshData.TexCoords = FRuntimeMeshVertexTexCoordStream(true);
 				pSection->MeshData.Tangents = FRuntimeMeshVertexTangentStream(true);
 				pMesh->SectionList.Add(pSection);
+				MatIndexSectionMap.Add(matIndex, pSection);
 				int32 maiID = -1;
 				if (matIndex < MatIndexArray.Num())
 				{

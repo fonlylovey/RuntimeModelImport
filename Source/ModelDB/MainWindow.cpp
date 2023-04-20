@@ -19,7 +19,7 @@ void UMainWindow::NativeConstruct()
 void UMainWindow::OnClickedImportModel(const FString& strPath)
 {
 	FImportOptions option;
-	option.MergeByMaterial = false;
+	option.MergeByMaterial = true;
 	Importer::LoadModel(strPath, option);
 }
 

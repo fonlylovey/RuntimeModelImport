@@ -12,7 +12,6 @@ class FModelOperator
 {
 public:
 	static FModelOperator* Instance();
-	static void Destruct();
 
 	ARuntimeActor* ReadModelFile(const FString& strPath, const FImportOptions& options = FImportOptions());
 

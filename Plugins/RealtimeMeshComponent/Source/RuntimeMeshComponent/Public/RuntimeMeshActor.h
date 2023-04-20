@@ -34,5 +34,4 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "RuntimeMeshActor", Meta = (DisplayName = "Get Runtime Mesh Component"))
 	class URuntimeMeshComponent* GetRuntimeMeshComponent() const { return RuntimeMeshComponent; }
 
-
 };

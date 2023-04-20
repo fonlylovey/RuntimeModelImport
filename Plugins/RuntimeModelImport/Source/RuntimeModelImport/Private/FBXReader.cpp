@@ -129,7 +129,7 @@ FModelMesh* FBXReader::ReadFile(const FString& strPath, const FImportOptions& op
 			m_pMaterialImport->MeshNodeCount = m_pMeshImport->MeshNodeCount;
 			PairMaterial();
 			//广播处理完全的完整mesh
-			Async(EAsyncExecution::TaskGraphMainThread, [=]()
+			Async(EAsyncExecution::TaskGraphMainThread, [&]()
 				{
 					m_mergeMatTask.Wait();
 					assert(m_pModelMesh != nullptr);

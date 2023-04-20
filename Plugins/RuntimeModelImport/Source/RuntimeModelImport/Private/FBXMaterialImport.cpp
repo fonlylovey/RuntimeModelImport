@@ -69,9 +69,10 @@ FModelMaterial FBXMaterialImport::readMaterial(FbxSurfaceMaterial* pSurfaceMater
 	depOffset += 0.01;
 	readNumberProperty(runtimeMat, pSurfaceMaterial);
 
-	//因为异步和saveGame的原因，不要在sdk层读取和创建纹理，材质，直接读图片的byte数据，在到actor中创建
-
-	readTexture(TEXT("DiffuseColor"), pSurfaceMaterial, runtimeMat.DiffuseMap);
+	//因为异步和saveGame的原因，不要在sdk层读取和创建纹理，材质，
+	//直接读图片的byte数据，在到actor中创建TEXT("DiffuseColor")
+	
+	readTexture(FbxSurfaceMaterial::sDiffuse, pSurfaceMaterial, runtimeMat.DiffuseMap);
 	//Read贴图
 	readTexture(TEXT("NormalMap"), pSurfaceMaterial, runtimeMat.NormalMap);
 

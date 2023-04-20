@@ -1,4 +1,4 @@
-#include "ModelSaveSystem.h"
+ï»¿#include "ModelSaveSystem.h"
 #include "Serialization/ArchiveCountMem.h"
 #include "Serialization/BufferArchive.h"
 #include <SaveGameSystem.h>
@@ -16,13 +16,13 @@ void FModelSaveSystem::SaveToFile(const FString& proDir, FModelMesh* mesh)
 {
 	FString strMeshPath = proDir + mesh->MeshGUID;
 	
-	//»ñÈ¡ÏîÄ¿ÎÄ¼ş¼ĞÏÂËùÓĞmeshÎÄ¼ş
+	//è·å–é¡¹ç›®æ–‡ä»¶å¤¹ä¸‹æ‰€æœ‰meshæ–‡ä»¶
 	IFileManager& fileMgr = IFileManager::Get();
 	TArray<FString> meshFiles;
 	fileMgr.FindFiles(meshFiles, *proDir, TEXT(".mesh"));
 
-	//ÅĞ¶ÏÈç¹ûmeshÎÄ¼şÒÑ¾­ÔÚ±¾µØ´æÔÚ£¬Ö±½Ó·µ»Ø
-	/* ¿´ÒµÎñĞèÒª£¬ÓĞ¿ÉÄÜÒÑ¾­´æÔÚÒ²ĞèÒª¸²¸Ç
+	//åˆ¤æ–­å¦‚æœmeshæ–‡ä»¶å·²ç»åœ¨æœ¬åœ°å­˜åœ¨ï¼Œç›´æ¥è¿”å›
+	/* çœ‹ä¸šåŠ¡éœ€è¦ï¼Œæœ‰å¯èƒ½å·²ç»å­˜åœ¨ä¹Ÿéœ€è¦è¦†ç›–
 	for (FString str : meshFiles)
 	{
 		if (str.Contains(mesh->MeshGUID))
@@ -33,11 +33,11 @@ void FModelSaveSystem::SaveToFile(const FString& proDir, FModelMesh* mesh)
 
 	ModelSaveAsyncPipe.Launch(UE_SOURCE_LOCATION, [this, strMeshPath, mesh]()
 	{
-			//¼ÆËãÄÚ´æ´óĞ¡£¬²¢ÇÒ·Ö¿é
+			//è®¡ç®—å†…å­˜å¤§å°ï¼Œå¹¶ä¸”åˆ†å—
 			TMap<int, TArray<FMeshData>> ChunkMap;
 			Traverse(mesh, ChunkMap);
 
-			//½«Ã¿Ò»¿éÄÚ´æÊı¾İ±£´æµÄ±¾µØ
+			//å°†æ¯ä¸€å—å†…å­˜æ•°æ®ä¿å­˜çš„æœ¬åœ°
 			int index = 0;
 			for (auto pair : ChunkMap)
 			{
@@ -51,9 +51,9 @@ void FModelSaveSystem::SaveToFile(const FString& proDir, FModelMesh* mesh)
 				}
 				Async(EAsyncExecution::TaskGraphMainThread, [=]()
 					{
-						FString strInfo = TEXT("Õı±£´æÎÄ¼ş: ") + saveGame->MeshUID + TEXT("_") + FString::FormatAsNumber(saveGame->ChunkID);
+						FString strInfo = TEXT("æ­£ä¿å­˜æ–‡ä»¶: ") + saveGame->MeshUID + TEXT("_") + FString::FormatAsNumber(saveGame->ChunkID);
 						FRMIDelegates::OnImportProgressDelegate.Broadcast(1, index,
-							ChunkMap.Num(), strInfo);
+							ChunkMap.Num(), MoveTemp(strInfo));
 					});
 				saveGame->SaveToFile();
 				saveGame->RemoveFromRoot();
@@ -61,9 +61,9 @@ void FModelSaveSystem::SaveToFile(const FString& proDir, FModelMesh* mesh)
 
 			Async(EAsyncExecution::TaskGraphMainThread, [=]()
 				{
-					FString strInfo = TEXT("±£´æÍê³É: ");
+					FString strInfo = TEXT("ä¿å­˜å®Œæˆ: ");
 					FRMIDelegates::OnImportProgressDelegate.Broadcast(1, 2,
-						2, strInfo);
+						2, MoveTemp(strInfo));
 				});
 	});
 
@@ -75,7 +75,7 @@ void FModelSaveSystem::Traverse(FModelMesh* pMesh, TMap<int, TArray<FMeshData>>&
 	static int chunkIndex = 0;
 	static int meshIndex = 0;
 	static int meshCount = pMesh->GetChildrenNum(true);
-	static size_t dataSize = 1024 * 1024 * 10; //Áô10MµÄ¿ÕÓà
+	static size_t dataSize = 1024 * 1024 * 10; //ç•™10Mçš„ç©ºä½™
 
 	if (chunkMap.Num() == 0)
 	{
@@ -88,7 +88,7 @@ void FModelSaveSystem::Traverse(FModelMesh* pMesh, TMap<int, TArray<FMeshData>>&
 	size_t meshSize = memAr.GetNum();
 	if (meshSize > MAX_int32)
 	{
-		FString strInfo = meshData.MeshName + TEXT("Ëù°üº¬µÄÊı¾İ´óÓÚ2G£¬Õâ²¿·ÖÊı¾İ½«²»»á±»±£´æ£¡Èç¹û¸ÄÄ£ĞÍºÏ²¢¹ı²ÄÖÊ£¬ÇëÈ¡ÏûºÏ²¢²ÄÖÊºóÔÙÊÔ¡£");
+		FString strInfo = meshData.MeshName + TEXT("æ‰€åŒ…å«çš„æ•°æ®å¤§äº2Gï¼Œè¿™éƒ¨åˆ†æ•°æ®å°†ä¸ä¼šè¢«ä¿å­˜ï¼å¦‚æœæ”¹æ¨¡å‹åˆå¹¶è¿‡æè´¨ï¼Œè¯·å–æ¶ˆåˆå¹¶æè´¨åå†è¯•ã€‚");
 		return;
 	}
 
@@ -107,9 +107,9 @@ void FModelSaveSystem::Traverse(FModelMesh* pMesh, TMap<int, TArray<FMeshData>>&
 
 	Async(EAsyncExecution::TaskGraphMainThread, [=]()
 		{
-			FString strInfo = TEXT("ÕıÔÚ¼ÆËãÄÚ´æ: ") + FString::FormatAsNumber(dataSize);
+			FString strInfo = TEXT("æ­£åœ¨è®¡ç®—å†…å­˜: ") + FString::FormatAsNumber(dataSize);
 			FRMIDelegates::OnImportProgressDelegate.Broadcast(1, meshIndex,
-				meshCount, strInfo);
+				meshCount, MoveTemp(strInfo));
 		});
 	meshIndex++;
 	for (auto val : pMesh->Children)
@@ -118,88 +118,72 @@ void FModelSaveSystem::Traverse(FModelMesh* pMesh, TMap<int, TArray<FMeshData>>&
 	}
 }
 
-TFuture<UModelSaveGame*> FModelSaveSystem::loadMeshFIleAsync(const FString& filePath, TFunction<void()> CompletionCallback)
-{
-	TFuture<UModelSaveGame*> futureObj = Async(EAsyncExecution::ThreadPool,
-		[this, filePath]() { return LoadMeshFile(filePath);  }, CompletionCallback);
-	return futureObj;
-}
-
 
 void FModelSaveSystem::LoadByFile(const FString& proDir)
 {
+	//MeshList.Empty();
 	ModelSaveAsyncPipe.Launch(UE_SOURCE_LOCATION, [&, proDir]()
 		{
-			//»ñÈ¡ÏîÄ¿ÎÄ¼ş¼ĞÏÂËùÓĞmeshÎÄ¼ş
+			FScopeLock ScopeLock(&Mutex);
+			//è·å–é¡¹ç›®æ–‡ä»¶å¤¹ä¸‹æ‰€æœ‰meshæ–‡ä»¶
 			IFileManager& fileMgr = IFileManager::Get();
 			TArray<FString> meshFiles;
 			fileMgr.FindFiles(meshFiles, *proDir, TEXT(".mesh"));
 
-			//±éÀúËùÓĞmeshÎÄ¼ş²¢ÇÒ°´ÕÕÄ£ĞÍID£¬¶ÁÈ¡ËùÓĞÎÄ¼şµ½SaveGame¶ÔÏóÖĞ
+			//éå†æ‰€æœ‰meshæ–‡ä»¶å¹¶ä¸”æŒ‰ç…§æ¨¡å‹IDï¼Œè¯»å–æ‰€æœ‰æ–‡ä»¶åˆ°SaveGameå¯¹è±¡ä¸­
 			TSet<FString> idSet;
 
 			TMultiMap<FString, UModelSaveGame*> saveGameMap;
-
 			int index = 0;
 			for (FString str : meshFiles)
 			{
-				Async(EAsyncExecution::TaskGraphMainThread, [=]()
+				Async(EAsyncExecution::TaskGraphMainThread, [&]()
 					{
-						FString strInfo = TEXT("ÕıÔÚ¼ÓÔØÄ£ĞÍ... ");
+						FString strInfo = TEXT("æ­£åœ¨åŠ è½½æ¨¡å‹... ");
 						FRMIDelegates::OnImportProgressDelegate.Broadcast(1, index,
 							meshFiles.Num(), strInfo);
 					});
-				//UModelSaveGame* savegame = loadMeshFIleAsync(proDir + str);
-				int a = 0;
 				
-				TFuture<UModelSaveGame*> futureObj = loadMeshFIleAsync(proDir + str, [&]()
-					{
-						if (futureObj.IsValid())
-						{
-							FScopeLock ScopeLock(&Mutex);
-							UModelSaveGame* savegame = futureObj.Get();
-							check(savegame != nullptr);
-							idSet.Add(savegame->MeshUID);
-							saveGameMap.Add(savegame->MeshUID, savegame);
-							index++;
-						}
-				});
-				futureObj.Wait();
+				UModelSaveGame* savegame = LoadMeshFile(proDir + str);
+				if (savegame != nullptr)
+				{
+					idSet.Add(savegame->MeshUID);
+					saveGameMap.Add(savegame->MeshUID, savegame);
+					index++;
+				}
 			}
 			
 			index = 0;
-			//½«¶à¸öÎÄ¼ş¿éµÄÊı¾İºÏ²¢³ÉÒ»¸ö
+			
+;			//å°†å¤šä¸ªæ–‡ä»¶å—çš„æ•°æ®åˆå¹¶æˆä¸€ä¸ª
 			for (FString meshID : idSet)
 			{
-				Async(EAsyncExecution::TaskGraphMainThread, [=]()
+				Async(EAsyncExecution::TaskGraphMainThread, [&]()
 					{
-						FString strInfo = TEXT("ÕıÔÚ´´½¨Mesh... ");
+						FString strInfo = TEXT("æ­£åœ¨åˆ›å»ºMesh... ");
 						FRMIDelegates::OnImportProgressDelegate.Broadcast(1, index,
-							idSet.Num(), strInfo);
+							idSet.Num(), TEXT("æ­£åœ¨åˆ›å»ºMesh... "));
 					});
 				TArray<UModelSaveGame*> saveList;
 				saveGameMap.MultiFind(meshID, saveList);
 				TMap<int32, FMeshData> DataMap;
 				for (UModelSaveGame* saveObj : saveList)
 				{
-					FScopeLock ScopeLock(&Mutex);
 					DataMap.Append(saveObj->MeshMap);
 				}
 
-				//½«Êı¾İ×ªÎªMesh
+				//å°†æ•°æ®è½¬ä¸ºMesh
 				TMap<int32, TSharedPtr<FModelMesh>> ModelMeshMap;
 				for (auto val : DataMap)
 				{
-					FScopeLock ScopeLock(&Mutex);
 					FMeshData meshData = val.Value;
 					FModelMesh* mesh = meshData.ToModelMesh();
-					ModelMeshMap.Add(mesh->MeshID, MakeShareable(mesh));
+					ModelMeshMap.Add(mesh->MeshID, MakeShareable(MoveTemp(mesh)));
 				}
 
-				//Éú³ÉÊ÷ĞÎ½á¹¹
+				//ç”Ÿæˆæ ‘å½¢ç»“æ„
 				for (auto val : ModelMeshMap)
 				{
-					FScopeLock ScopeLock(&Mutex);
 					auto TheMesh = val.Value;
 					if (TheMesh->ParentID == -1)
 					{
@@ -216,11 +200,11 @@ void FModelSaveSystem::LoadByFile(const FString& proDir)
 				index++;
 			}
 
-			Async(EAsyncExecution::TaskGraphMainThread, [=]()
+			Async(EAsyncExecution::TaskGraphMainThread, [&]()
 				{
-					FString strInfo = TEXT("¼ÓÔØÄ£ĞÍÍê³É£¡");
+					FString strInfo = TEXT("åŠ è½½æ¨¡å‹å®Œæˆï¼");
 					FRMIDelegates::OnImportProgressDelegate.Broadcast(1, 1,
-						1, strInfo);
+						1, TEXT("åŠ è½½æ¨¡å‹å®Œæˆï¼"));
 					OnLoadComplete.Broadcast(MeshList);
 				});
 			
@@ -250,7 +234,6 @@ UModelSaveGame* FModelSaveSystem::LoadMeshFile(const FString& filePath)
 		USaveGame* saveGame = NewObject<USaveGame>(GetTransientPackage(), SaveGameClass);
 		if (saveGame != NULL)
 		{
-			//FLargeMemoryReader Ar(ObjectBytes->GetData(), ObjectBytes->Num());
 			FObjectAndNameAsStringProxyArchive Ar(MemoryReader, true);
 			saveGame->Serialize(Ar);
 		}

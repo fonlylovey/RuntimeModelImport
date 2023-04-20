@@ -74,5 +74,8 @@ private:
 	TArray< TSharedPtr<FRuntimeMeshSectionData>> SectionList;
 	TArray<FModelMesh*> MeshList;
 	TArray<int32> MatIndexArray;
+
+	//²âÊÔÓÃµÄ
+	TSet<int> MatIndexSet;
 };
 
