@@ -120,7 +120,7 @@ FModelMesh* FBXReader::ReadFile(const FString& strPath, const FImportOptions& op
 			m_readMatTask.Wait();
 			m_pModelMesh = m_pMeshImport->LoadMesh(m_pFbxScene);
 		});
-
+	
 	//关联材质
 	MatMap matMap = m_pMaterialImport->GetMaterialMap();
 	m_mergeMatTask = Async(EAsyncExecution::TaskGraph, [=]()
@@ -137,7 +137,7 @@ FModelMesh* FBXReader::ReadFile(const FString& strPath, const FImportOptions& op
 					FRMIDelegates::OnMeshTreeBuildFinishDelegate.Broadcast(m_pModelMesh);
 				});
 		});
-
+		
 	
 	return nullptr;
 }

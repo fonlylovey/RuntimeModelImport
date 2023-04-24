@@ -226,7 +226,7 @@ UModelSaveGame* FModelSaveSystem::LoadMeshFile(const FString& filePath)
 		FString SaveGameClassName;
 		MemoryReader << SaveGameClassName;
 
-		UClass* SaveGameClass = FindObject<UClass>(ANY_PACKAGE, *SaveGameClassName);
+		UClass* SaveGameClass = FindObject<UClass>(nullptr, *SaveGameClassName);
 		if (SaveGameClass == NULL)
 		{
 			SaveGameClass = LoadObject<UClass>(NULL, *SaveGameClassName);

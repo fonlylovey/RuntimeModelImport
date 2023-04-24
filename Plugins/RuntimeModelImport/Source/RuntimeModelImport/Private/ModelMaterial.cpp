@@ -1,4 +1,10 @@
 #include "ModelMaterial.h"
+#include "GenMipmap.h"
+
+FModelTexture::~FModelTexture()
+{
+	BulkData.Empty();
+}
 
 FModelMaterial::FModelMaterial(int32 id, FString name)
 {
@@ -46,19 +52,24 @@ FModelMaterial::~FModelMaterial()
 	IsTransparent = false;
 	DiffuseColor = FLinearColor(1, 1, 1, 1);
 	EmissiveColor = FLinearColor(1, 1, 1, 1);
-	
 }
 
-UTexture2D* FModelTexture::ToTexture()
+UTexture2D* FModelTexture::ToTexture(bool genMipmap)
 {
-	UTexture2D* texture = nullptr;
-	/*UTexture2D* */texture = UTexture2D::CreateTransient(SizeX, SizeY, PF_B8G8R8A8);
+	UTexture2D* texture  = UTexture2D::CreateTransient(SizeX, SizeY, PF_B8G8R8A8);
 	if (texture != nullptr)
 	{
 		texture->AddToRoot();
+		texture->MipGenSettings = TMGS_Sharpen4;
 		void* TextureData = texture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 		FMemory::Memcpy(TextureData, BulkData.GetData(), BulkData.Num());
 		texture->GetPlatformData()->Mips[0].BulkData.Unlock();
+		if(genMipmap)
+		{
+			FGenMipmap GenMip;
+			GenMip.Init(SizeX, SizeY, TSF_BGRA8, BulkData.GetData(), BulkData.Num());
+			GenMip.GetMipMap(texture);
+		}
 		if (IsInGameThread())
 		{
 			texture->UpdateResource();

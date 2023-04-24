@@ -54,7 +54,8 @@ void ARuntimeActor::Init(FModelMesh* mesh)
 			section->Properties.bIsMainPassRenderable = true;
 			section->Properties.bWants32BitIndices = true;
 			section->Properties.UpdateFrequency = ERuntimeMeshUpdateFrequency::Average;
-			URuntimeMeshModifierNormals::CalculateNormalsTangents(section->MeshData);
+			
+			//URuntimeMeshModifierNormals::CalculateNormalsTangents(section->MeshData);
 			Provider->CreateSection(0, i, section->Properties, section->MeshData);
 
 			BoundingSphere = Provider->GetBounds();
@@ -64,13 +65,15 @@ void ARuntimeActor::Init(FModelMesh* mesh)
 				parent->BoundingSphere = parent->BoundingSphere + BoundingSphere;
 			}
 		}
-
+		
 		for (int i = 0; i < mesh->MaterialList.Num(); i++)
 		{
 			UMaterialInterface* mat = CreateMaterial(mesh->MaterialList[i]);
 			if (mat)
 				Provider->SetupMaterialSlot(i, FName(mesh->MaterialList[i].Name), mat);
 		}
+		mesh->MaterialList.Empty();
+		mesh->SectionList.Empty();
 
 		//进度广播
 		//Async(EAsyncExecution::TaskGraphMainThread, [&]()
@@ -167,7 +170,8 @@ UMaterialInterface* ARuntimeActor::CreateMaterial(FModelMaterial& mat)
 
 	if (mat.DiffuseMap.BulkData.Num() > 0)
 	{
-		dynamicMaterial->SetTextureParameterValue(FName("DiffuseTexture"), mat.DiffuseMap.ToTexture());
+		dynamicMaterial->SetTextureParameterValue(FName("DiffuseTexture"), mat.DiffuseMap.ToTexture(false));
+		mat.DiffuseMap.BulkData.Empty();
 	}
 	else
 	{
@@ -176,7 +180,8 @@ UMaterialInterface* ARuntimeActor::CreateMaterial(FModelMaterial& mat)
 
 	if (mat.NormalMap.BulkData.Num() > 0)
 	{
-		dynamicMaterial->SetTextureParameterValue(FName("NormalTexture"), mat.NormalMap.ToTexture());
+		dynamicMaterial->SetTextureParameterValue(FName("NormalTexture"), mat.NormalMap.ToTexture(false));
+		mat.NormalMap.BulkData.Empty();
 	}
 
 	dynamicMaterial->SetVectorParameterValue(FName("EmissiveColor"), mat.EmissiveColor);
@@ -194,8 +199,6 @@ UMaterialInterface* ARuntimeActor::CreateMaterial(FModelMaterial& mat)
 	{
 		dynamicMaterial->SetScalarParameterValue(FName("Opacity"), mat.Opacity);
 	}
-
-	
 
 	return dynamicMaterial;
 }

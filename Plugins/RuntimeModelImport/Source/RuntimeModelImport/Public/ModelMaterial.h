@@ -23,7 +23,10 @@ struct RUNTIMEMODELIMPORT_API FModelTexture
 		SizeY = 0;
 	};
 
-	UTexture2D* ToTexture();
+	~FModelTexture();
+
+
+	UTexture2D* ToTexture(bool genMipmap = true);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 SizeX;
