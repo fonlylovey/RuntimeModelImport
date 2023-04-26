@@ -250,8 +250,8 @@ void URuntimeMeshComponent::OnUnregister()
 {
 	if (RuntimeMeshReference)
 	{
-		RuntimeMeshReference->UnRegisterLinkedComponent(this);
-		RuntimeMeshReference = nullptr;
+		//RuntimeMeshReference->UnRegisterLinkedComponent(this);
+		//RuntimeMeshReference = nullptr;
 	}
 
 	Super::OnUnregister();

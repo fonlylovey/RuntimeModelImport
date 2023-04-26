@@ -5,7 +5,7 @@
 #include "Runtime/Core/Public/HAL/ThreadingBase.h"
 #include "IImageWrapperModule.h"
 
-typedef TMap<int32, FModelMaterial> MatMap;
+typedef TMap<int32, TSharedPtr<FModelMaterial>> MatMap;
 
 class FBXMaterialImport : public FGCObject
 {
@@ -15,14 +15,14 @@ public:
 
 	virtual void AddReferencedObjects(FReferenceCollector& Collector);
 
-	const MatMap LoadMaterial(FbxScene* scene, const FString& strPath);
-	inline const MatMap GetMaterialMap() { return MaterialMap; }
+	void LoadMaterial(FbxScene* scene, const FString& strPath);
 
+	MatMap MaterialMap;
 	int MeshNodeCount = 0; //带有Mesh的节点数量
 
 private:
 	//材质系统读取 材质分为 普通材质、纹理、shader三部分
-	FModelMaterial readMaterial(FbxSurfaceMaterial* pSurfaceMaterial);
+	TSharedPtr<FModelMaterial> readMaterial(FbxSurfaceMaterial* pSurfaceMaterial);
 
 	//这里函数内部使用移动语义，不要直接返回临时对象
 	bool readTexture(FString textureName, FbxSurfaceMaterial* pSurfaceMaterial, FModelTexture& byteData);
@@ -32,7 +32,7 @@ private:
 	float readFloatProperty(FString propertyName, FbxSurfaceMaterial* pSurfaceMaterial);
 	FLinearColor readColorProperty(FString propertyName, FbxSurfaceMaterial* pSurfaceMaterial);
 
-	void readNumberProperty(FModelMaterial& modelMat, FbxSurfaceMaterial* pSurfaceMaterial);
+	void readNumberProperty(TSharedPtr<FModelMaterial> modelMat, FbxSurfaceMaterial* pSurfaceMaterial);
 
 	void readShader(FbxSurfaceMaterial* pSurfaceMaterial, const FbxImplementation* pImplementation, FbxString& shaderType);
 
@@ -52,7 +52,6 @@ private:
 	int readIndex = 0; //当前处理的节点index
 	//材质ID+材质实例
 	FString strFBxPath;
-	MatMap MaterialMap;
 	FString strDefaultMat;
 	FString strTransparentMat;
 	UMaterialInterface* DefaultMat;

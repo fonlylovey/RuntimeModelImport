@@ -20,8 +20,9 @@ struct FMeshData
 public:
 	FMeshData() = default;
 	FMeshData(FModelMesh* pMesh);
+	~FMeshData();
 
-	FModelMesh* ToModelMesh();
+	TSharedPtr<FModelMesh> ToModelMesh();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MeshID;
@@ -45,9 +46,6 @@ public:
 	TArray<FModelMaterial> MateritalList;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<uint8> TextureList;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform Transform;
 };
 
@@ -62,7 +60,10 @@ public:
 		
 	}
 	~UMemCalc() 
-	{ 
+	{
+		Data.MateritalList.Empty();
+		Data.PropertyList.Empty();
+		Data.RenderableList.Empty();
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -88,7 +89,6 @@ public:
 	//存档时使用的SP版本号
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ArchiveVersion;
-
 
 	FString MeshUID;
 

@@ -9,20 +9,20 @@ public:
 	FBXMeshImport();
 	virtual ~FBXMeshImport();
 
-	FModelMesh* LoadMesh(FbxScene* scene);
+	TSharedPtr<FModelMesh> LoadMesh(FbxScene* scene);
 
-	inline TArray<FModelMesh*> GetMeshList() { return MeshList; };
+	inline TArray<TSharedPtr<FModelMesh>> GetMeshList() { return MeshList; };
 
 	inline TArray<TSharedPtr<FRuntimeMeshSectionData>> GetSections() { return SectionList; };
 	
-	FModelMesh* m_pRootMesh;
+	TSharedPtr<FModelMesh> m_pRootMesh;
 
 	int MeshNodeCount = 0; //带有Mesh的节点数量
 
 private:
-	void traverseNode(FbxNode* pNode, FModelMesh* pMesh);
+	void traverseNode(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh);
 
-	void readMesh(FbxNode* pNode, FModelMesh* pMesh);
+	void readMesh(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh);
 
 	//读取顶点
 	FVector3f readVertex(FbxVector4* pVertexArray, int vertexIndex);
@@ -71,11 +71,8 @@ private:
 	int readIndex = 0; //当前处理的节点index
 	int meshCount = 0;
 	FbxAMatrix globalMatrix;
-	TArray< TSharedPtr<FRuntimeMeshSectionData>> SectionList;
-	TArray<FModelMesh*> MeshList;
+	TArray<TSharedPtr<FRuntimeMeshSectionData>> SectionList;
+	TArray<TSharedPtr<FModelMesh>> MeshList;
 	TArray<int32> MatIndexArray;
-
-	//测试用的
-	TSet<int> MatIndexSet;
 };
 

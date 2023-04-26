@@ -33,74 +33,10 @@ void ARuntimeActor::SetModelMesh(TSharedPtr<FModelMesh> mesh)
 	meshCount = mesh->GetChildrenNum();;
 
 	SetActorTransform(ModelMesh->MeshMatrix);
-	traverseMeshTree(mesh.Get(), this);
+	traverseMeshTree(mesh, this);
 }
 
-void ARuntimeActor::Init(FModelMesh* mesh)
-{
-	FString ueName = mesh->MeshName;
-	GetRuntimeMeshComponent()->AppendName(ueName);
-	if (Provider != nullptr)
-	{
-		FScopeLock ScopeLock(&Mutex);
-		for (int i = 0; i < mesh->SectionList.Num(); i++)
-		{
-			TSharedPtr <FRuntimeMeshSectionData> section = mesh->SectionList[i];
-			section->Properties.bCastsShadow = true;
-			section->Properties.bIsVisible = true;
-			mesh->MaterialList.Num() >= i ?
-				section->Properties.MaterialSlot = i :
-				section->Properties.MaterialSlot = 0;
-			section->Properties.bIsMainPassRenderable = true;
-			section->Properties.bWants32BitIndices = true;
-			section->Properties.UpdateFrequency = ERuntimeMeshUpdateFrequency::Average;
-			
-			//URuntimeMeshModifierNormals::CalculateNormalsTangents(section->MeshData);
-			Provider->CreateSection(0, i, section->Properties, section->MeshData);
-
-			BoundingSphere = Provider->GetBounds();
-			ARuntimeActor* parent = Cast<ARuntimeActor>(GetOwner());
-			if (parent != nullptr)
-			{
-				parent->BoundingSphere = parent->BoundingSphere + BoundingSphere;
-			}
-		}
-		
-		for (int i = 0; i < mesh->MaterialList.Num(); i++)
-		{
-			UMaterialInterface* mat = CreateMaterial(mesh->MaterialList[i]);
-			if (mat)
-				Provider->SetupMaterialSlot(i, FName(mesh->MaterialList[i].Name), mat);
-		}
-		mesh->MaterialList.Empty();
-		mesh->SectionList.Empty();
-
-		//进度广播
-		//Async(EAsyncExecution::TaskGraphMainThread, [&]()
-		//	{
-				++readIndex;
-				FString strInfo = TEXT("生成Actor: " + mesh->MeshName);
-				FRMIDelegates::OnImportProgressDelegate.Broadcast(1, readIndex, meshCount, MoveTemp(strInfo));
-
-				if (readIndex >= meshCount)
-				{
-					FRMIDelegates::OnSpawnActorFinishDelegate.Broadcast();
-					FRMIDelegates::OnImportProgressDelegate.Broadcast(1, 1, 1, TEXT("导入完成"));
-				}
-				
-		//	});
-	}
-}
-
-void ARuntimeActor::AsyncInit(FModelMesh* mesh)
-{
-	Async(EAsyncExecution::ThreadPool, [&, mesh]()
-		{
-		Init(mesh);
-		});
-}
-
-void ARuntimeActor::traverseMeshTree(FModelMesh* mesh, AActor* pParent)
+void ARuntimeActor::traverseMeshTree(TSharedPtr<FModelMesh> mesh, AActor* pParent)
 {
 	if (!mesh->IsRoot)
 	{
@@ -129,7 +65,7 @@ void ARuntimeActor::traverseMeshTree(FModelMesh* mesh, AActor* pParent)
 	{
 		for (auto pShareMesh : mesh->Children)
 		{
-			traverseMeshTree(pShareMesh.Get(), pParent);
+			traverseMeshTree(pShareMesh, pParent);
 		}
 	}
 }
@@ -147,12 +83,79 @@ void ARuntimeActor::traverseActor(ARuntimeActor* rootActor)
 	}
 }
 
-UMaterialInterface* ARuntimeActor::CreateMaterial(FModelMaterial& mat)
+
+void ARuntimeActor::Init(TSharedPtr<FModelMesh> mesh)
+{
+	FString ueName = mesh->MeshName;
+	GetRuntimeMeshComponent()->AppendName(ueName);
+	if (Provider != nullptr)
+	{
+		FScopeLock ScopeLock(&Mutex);
+		for (int i = 0; i < mesh->SectionList.Num(); i++)
+		{
+			TSharedPtr <FRuntimeMeshSectionData> section = mesh->SectionList[i];
+			section->Properties.bCastsShadow = true;
+			section->Properties.bIsVisible = true;
+			mesh->MaterialList.Num() >= i ?
+				section->Properties.MaterialSlot = i :
+				section->Properties.MaterialSlot = 0;
+			section->Properties.bIsMainPassRenderable = true;
+			section->Properties.bWants32BitIndices = true;
+			section->Properties.UpdateFrequency = ERuntimeMeshUpdateFrequency::Average;
+
+			//URuntimeMeshModifierNormals::CalculateNormalsTangents(section->MeshData);
+			Provider->CreateSection(0, i, section->Properties, section->MeshData);
+
+			BoundingSphere = Provider->GetBounds();
+			ARuntimeActor* parent = Cast<ARuntimeActor>(GetOwner());
+			if (parent != nullptr)
+			{
+				parent->BoundingSphere = parent->BoundingSphere + BoundingSphere;
+			}
+		}
+
+		for (int i = 0; i < mesh->MaterialList.Num(); i++)
+		{
+			UMaterialInstanceDynamic* mat = CreateMaterial(mesh->MaterialList[i]);
+			if (mat)
+			{
+				mesh->DynamicMaterialList.Add(mat);
+				Provider->SetupMaterialSlot(i, FName(mesh->MaterialList[i]->Name), mat);
+			}
+		}
+		//mesh->MaterialList.Empty();
+		//mesh->SectionList.Empty();
+		//进度广播
+		Async(EAsyncExecution::TaskGraphMainThread, [&]()
+			{
+				++readIndex;
+				FString strInfo = TEXT("生成Actor: " + mesh->MeshName);
+				FRMIDelegates::OnImportProgressDelegate.Broadcast(1, readIndex, meshCount, MoveTemp(strInfo));
+
+				if (readIndex >= meshCount)
+				{
+					FRMIDelegates::OnSpawnActorFinishDelegate.Broadcast();
+					FRMIDelegates::OnImportProgressDelegate.Broadcast(1, 1, 1, TEXT("导入完成"));
+				}
+
+			});
+	}
+}
+
+void ARuntimeActor::AsyncInit(TSharedPtr<FModelMesh> mesh)
+{
+	Async(EAsyncExecution::ThreadPool, [&, mesh]()
+		{
+			Init(mesh);
+		});
+}
+
+UMaterialInstanceDynamic* ARuntimeActor::CreateMaterial(TSharedPtr<FModelMaterial> mat)
 {
 	//此处有个析构的问题待解决, 先用这个方法检测一下是否崩溃
 	FSoftObjectPath softPath;
 	UMaterialInstanceDynamic* dynamicMaterial = nullptr;
-	if (mat.Opacity == 1.0)
+	if (mat->Opacity == 1.0)
 	{
 		softPath = FSoftObjectPath(RMI_DEFAULTMAT);
 	}
@@ -163,44 +166,57 @@ UMaterialInterface* ARuntimeActor::CreateMaterial(FModelMaterial& mat)
 
 	UObject* itemObj = softPath.TryLoad();
 	UMaterialInterface* baseMaterial = Cast<UMaterialInterface>(itemObj);
-	dynamicMaterial = UMaterialInstanceDynamic::Create(baseMaterial, this, FName(mat.Name));
+	dynamicMaterial = UMaterialInstanceDynamic::Create(baseMaterial, this, FName(mat->Name));
 
 	if (!dynamicMaterial)
 		return nullptr;
 
-	if (mat.DiffuseMap.BulkData.Num() > 0)
+	
+	if (mat->DiffuseMap.BulkData.Num() > 0)
 	{
-		dynamicMaterial->SetTextureParameterValue(FName("DiffuseTexture"), mat.DiffuseMap.ToTexture(false));
-		mat.DiffuseMap.BulkData.Empty();
+		UTexture2D* texture = mat->DiffuseMap.ToTexture(true);
+		dynamicMaterial->SetTextureParameterValue(FName("DiffuseTexture"), texture);
+		texture->RemoveFromRoot();
 	}
 	else
 	{
-		dynamicMaterial->SetVectorParameterValue(FName("DiffuseColor"), mat.DiffuseColor);
+		dynamicMaterial->SetVectorParameterValue(FName("DiffuseColor"), mat->DiffuseColor);
 	}
 
-	if (mat.NormalMap.BulkData.Num() > 0)
+	
+	if (mat->NormalMap.BulkData.Num() > 0)
 	{
-		dynamicMaterial->SetTextureParameterValue(FName("NormalTexture"), mat.NormalMap.ToTexture(false));
-		mat.NormalMap.BulkData.Empty();
+		UTexture2D* texture = mat->NormalMap.ToTexture(true);
+		dynamicMaterial->SetTextureParameterValue(FName("NormalTexture"), texture);
+		texture->RemoveFromRoot();
 	}
 
-	dynamicMaterial->SetVectorParameterValue(FName("EmissiveColor"), mat.EmissiveColor);
-	dynamicMaterial->SetScalarParameterValue(FName("EmissiveFactor"), mat.EmissiveFactor);
+	dynamicMaterial->SetVectorParameterValue(FName("EmissiveColor"), mat->EmissiveColor);
+	dynamicMaterial->SetScalarParameterValue(FName("EmissiveFactor"), mat->EmissiveFactor);
 
-	if(mat.Opacity == 1.0)
+	if(mat->Opacity == 1.0)
 	{
-		dynamicMaterial->SetScalarParameterValue(FName("DiffuseFactor"), mat.DiffuseFactor);
-		dynamicMaterial->SetScalarParameterValue(FName("DepthOffset"), mat.DepthOffset);
-		dynamicMaterial->SetScalarParameterValue(FName("Metallic"), mat.Metallic);
-		dynamicMaterial->SetScalarParameterValue(FName("Roughness"), mat.Roughness);
-		dynamicMaterial->SetScalarParameterValue(FName("Specular"), mat.Specular);
+		dynamicMaterial->SetScalarParameterValue(FName("DiffuseFactor"), mat->DiffuseFactor);
+		dynamicMaterial->SetScalarParameterValue(FName("DepthOffset"), mat->DepthOffset);
+		dynamicMaterial->SetScalarParameterValue(FName("Metallic"), mat->Metallic);
+		dynamicMaterial->SetScalarParameterValue(FName("Roughness"), mat->Roughness);
+		dynamicMaterial->SetScalarParameterValue(FName("Specular"), mat->Specular);
 	}
 	else
 	{
-		dynamicMaterial->SetScalarParameterValue(FName("Opacity"), mat.Opacity);
+		dynamicMaterial->SetScalarParameterValue(FName("Opacity"), mat->Opacity);
 	}
-
 	return dynamicMaterial;
+}
+
+TSharedPtr<FModelMaterial> ARuntimeActor::ConvertMaterial(UMaterialInstanceDynamic* dynamicMaterial)
+{
+	TSharedPtr<FModelMaterial> modelMat = MakeShared<FModelMaterial>();
+	modelMat->Name = dynamicMaterial->GetName();
+	modelMat->Opacity = dynamicMaterial->K2_GetScalarParameterValue(FName("Opacity"));
+	modelMat->DiffuseColor = dynamicMaterial->K2_GetVectorParameterValue(FName("DiffuseColor"));
+	modelMat->DiffuseMap = FModelTexture(Cast<UTexture2D>(dynamicMaterial->K2_GetTextureParameterValue(FName("DiffuseTexture"))));
+	return modelMat;
 }
 
 void ARuntimeActor::SetMaterialSlot(int32 MaterialSlot, FName SlotName, UMaterialInterface* InMaterial)
@@ -233,6 +249,7 @@ void ARuntimeActor::BeginDestroy()
 {
 	Super::BeginDestroy();
 	ModelMesh.Reset();
+	ModelMesh = nullptr;
 }
 
 void ARuntimeActor::Tick(float DeltaTime)

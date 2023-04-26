@@ -17,6 +17,8 @@ struct RUNTIMEMODELIMPORT_API FModelTexture
 {
 	GENERATED_USTRUCT_BODY();
 
+	FModelTexture(UTexture2D* uTexture);
+
 	FModelTexture()
 	{
 		SizeX = 0;
@@ -47,6 +49,8 @@ struct RUNTIMEMODELIMPORT_API FModelMaterial
 	FModelMaterial();
 
 	FModelMaterial(int32 id, FString name);
+	FModelMaterial(const FModelMaterial&);
+
 	~FModelMaterial();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -46,7 +46,7 @@ ARuntimeActor* FModelOperator::ReadModelFile(const FString& strPath, const FImpo
 
 void FModelOperator::SaveModel(const FString& saveDir, ARuntimeActor* actor)
 {
-	FModelMesh* modelMesh = actor->GetModelMesh();
+	TSharedPtr<FModelMesh> modelMesh = actor->GetModelMesh();
 	modelMesh->MeshMatrix = actor->GetActorTransform();
 	m_pSaveModelPtr->SaveToFile(saveDir, modelMesh);
 }
@@ -122,12 +122,15 @@ FModelOperator* FModelOperator::Instance()
 	return s_pSelf;
 }
 
-void FModelOperator::OnMeshTreeBuildFinishDelegateListen(FModelMesh* pRoot)
+void FModelOperator::OnMeshTreeBuildFinishDelegateListen(TSharedPtr<FModelMesh> pRoot)
 {
 	if (!pRoot)
 		return;
+	m_pReader.Reset();
+	m_pReader = nullptr;
 	pRoot->MeshGUID = FGuid::NewGuid().ToString();
-	m_pModelActor->SetModelMesh(MakeShareable(pRoot));
+	m_pModelActor->SetModelMesh(pRoot);
 	m_pModelActor->GUID = pRoot->MeshGUID;
 	FRMIDelegates::OnImportCompleteDelegate.Broadcast(m_pModelActor);
+	
 }

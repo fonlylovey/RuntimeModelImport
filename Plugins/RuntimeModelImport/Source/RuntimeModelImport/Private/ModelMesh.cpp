@@ -32,6 +32,7 @@ FModelMesh::~FModelMesh()
 	Children.Empty();
 	SectionList.Empty();
 	MaterialList.Empty();
+	DynamicMaterialList.Empty();
 }
 
 int32 FModelMesh::GetChildrenNum(bool bRecursion /*= false*/)

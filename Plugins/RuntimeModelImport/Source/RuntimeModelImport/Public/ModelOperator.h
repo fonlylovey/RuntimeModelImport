@@ -36,7 +36,7 @@ private:
 	FString GetSuffix(const FString& strPath);
 
 	//监听Mesh树状结构完成, 目的是拿到根节点的FModelMesh*对象(已经Build好的), 可以去SpawnActor了
-	void OnMeshTreeBuildFinishDelegateListen(FModelMesh* pRoot);
+	void OnMeshTreeBuildFinishDelegateListen(TSharedPtr<FModelMesh> pRoot);
 
 private:
 	static FModelOperator* s_pSelf;

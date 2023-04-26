@@ -12,7 +12,7 @@ UE::Tasks::FPipe FModelSaveSystem::ModelSaveAsyncPipe { TEXT("ModelSaveAsyncPipe
 
 FModelSaveSystem::FOnLoadCompleteDelegate FModelSaveSystem::OnLoadComplete;
 
-void FModelSaveSystem::SaveToFile(const FString& proDir, FModelMesh* mesh)
+void FModelSaveSystem::SaveToFile(const FString& proDir, TSharedPtr<FModelMesh> mesh)
 {
 	FString strMeshPath = proDir + mesh->MeshGUID;
 	
@@ -34,8 +34,8 @@ void FModelSaveSystem::SaveToFile(const FString& proDir, FModelMesh* mesh)
 	ModelSaveAsyncPipe.Launch(UE_SOURCE_LOCATION, [this, strMeshPath, mesh]()
 	{
 			//计算内存大小，并且分块
-			TMap<int, TArray<FMeshData>> ChunkMap;
-			Traverse(mesh, ChunkMap);
+			ChunkMap.Empty();
+			Traverse(mesh);
 
 			//将每一块内存数据保存的本地
 			int index = 0;
@@ -58,29 +58,37 @@ void FModelSaveSystem::SaveToFile(const FString& proDir, FModelMesh* mesh)
 				saveGame->SaveToFile();
 				saveGame->RemoveFromRoot();
 			}
-
+	
 			Async(EAsyncExecution::TaskGraphMainThread, [=]()
 				{
 					FString strInfo = TEXT("保存完成: ");
 					FRMIDelegates::OnImportProgressDelegate.Broadcast(1, 2,
 						2, MoveTemp(strInfo));
 				});
+			ChunkMap.Empty();
 	});
 
 }
 
-void FModelSaveSystem::Traverse(FModelMesh* pMesh, TMap<int, TArray<FMeshData>>& chunkMap)
+void FModelSaveSystem::Traverse(TSharedPtr<FModelMesh> pMesh)
 {
-	FMeshData meshData = FMeshData(pMesh);
+	FMeshData meshData = FMeshData(pMesh.Get());
+	if(ChunkMap.IsEmpty())
+	{
+		ChunkMap.Add(0, TArray<FMeshData>());
+	}
+	TArray<FMeshData>& chunk = ChunkMap[0];
+	chunk.Add(meshData);
+	/*
 	static int chunkIndex = 0;
 	static int meshIndex = 0;
 	static int meshCount = pMesh->GetChildrenNum(true);
-	static size_t dataSize = 1024 * 1024 * 10; //留10M的空余
+	static size_t dataSize = 1024 * 1024 * 100; //留100M的空余
 
-	if (chunkMap.Num() == 0)
+	if (ChunkMap.Num() == 0)
 	{
 		chunkIndex = 0;
-		chunkMap.Add(0, TArray<FMeshData>());
+		ChunkMap.Add(0, TArray<FMeshData>());
 	}
 	UMemCalc* pMemCalc = NewObject<UMemCalc>();
 	pMemCalc->Data = meshData;
@@ -95,16 +103,16 @@ void FModelSaveSystem::Traverse(FModelMesh* pMesh, TMap<int, TArray<FMeshData>>&
 	dataSize += meshSize;
 	if (dataSize < MAX_int32)
 	{
-		TArray<FMeshData>& chunk = chunkMap[chunkIndex];
+		TArray<FMeshData>& chunk = ChunkMap[chunkIndex];
 		chunk.Add(meshData);
 	}
 	else
 	{
 		dataSize = memAr.GetNum();
 		chunkIndex++;
-		chunkMap.Add(chunkIndex, { meshData });
+		ChunkMap.Add(chunkIndex, { meshData });
 	}
-
+	pMemCalc = nullptr;
 	Async(EAsyncExecution::TaskGraphMainThread, [=]()
 		{
 			FString strInfo = TEXT("正在计算内存: ") + FString::FormatAsNumber(dataSize);
@@ -112,9 +120,10 @@ void FModelSaveSystem::Traverse(FModelMesh* pMesh, TMap<int, TArray<FMeshData>>&
 				meshCount, MoveTemp(strInfo));
 		});
 	meshIndex++;
-	for (auto val : pMesh->Children)
+	*/
+	for (TSharedPtr<FModelMesh, ESPMode::ThreadSafe> val : pMesh->Children)
 	{
-		Traverse(val.Get(), chunkMap);
+		Traverse(val);
 	}
 }
 
@@ -177,8 +186,8 @@ void FModelSaveSystem::LoadByFile(const FString& proDir)
 				for (auto val : DataMap)
 				{
 					FMeshData meshData = val.Value;
-					FModelMesh* mesh = meshData.ToModelMesh();
-					ModelMeshMap.Add(mesh->MeshID, MakeShareable(MoveTemp(mesh)));
+					TSharedPtr<FModelMesh> mesh = meshData.ToModelMesh();
+					ModelMeshMap.Add(mesh->MeshID, mesh);
 				}
 
 				//生成树形结构
@@ -194,7 +203,7 @@ void FModelSaveSystem::LoadByFile(const FString& proDir)
 					{
 						TSharedPtr<FModelMesh> Parent = ModelMeshMap[TheMesh->ParentID];
 						Parent->Children.Add(TheMesh);
-						TheMesh->Parent = Parent.Get();
+						TheMesh->Parent = Parent;
 					}
 				}
 				index++;
@@ -217,16 +226,17 @@ UModelSaveGame* FModelSaveSystem::LoadMeshFile(const FString& filePath)
 	FString modelID = FPaths::GetBaseFilename(filePath);
 	modelID = modelID.Left(modelID.Find("_"));
 	UModelSaveGame* meshObj = NULL;
-	TSharedRef<TArray<uint8>> ObjectBytes = MakeShared<TArray<uint8>>();
-	bool bSuccess = FFileHelper::LoadFileToArray(ObjectBytes.Get(), *filePath);
+	//TSharedRef<> ObjectBytes = MakeShared<TArray<uint8>>();
+	TArray64<uint8> ObjectBytes;
+	bool bSuccess = FFileHelper::LoadFileToArray(ObjectBytes, *filePath);
 	if (bSuccess)
 	{
-		FMemoryReader MemoryReader(ObjectBytes.Get(), true);
-
+		//FMemoryReader MemoryReader(ObjectBytes.Get(), true);
+		FLargeMemoryReader MemoryReader(ObjectBytes.GetData(), ObjectBytes.Num());
 		FString SaveGameClassName;
 		MemoryReader << SaveGameClassName;
 
-		UClass* SaveGameClass = FindObject<UClass>(nullptr, *SaveGameClassName);
+		UClass* SaveGameClass = FindObject<UClass>(ANY_PACKAGE, *SaveGameClassName);
 		if (SaveGameClass == NULL)
 		{
 			SaveGameClass = LoadObject<UClass>(NULL, *SaveGameClassName);

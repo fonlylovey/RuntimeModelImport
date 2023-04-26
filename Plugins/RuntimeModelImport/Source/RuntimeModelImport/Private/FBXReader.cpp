@@ -122,7 +122,6 @@ FModelMesh* FBXReader::ReadFile(const FString& strPath, const FImportOptions& op
 		});
 	
 	//关联材质
-	MatMap matMap = m_pMaterialImport->GetMaterialMap();
 	m_mergeMatTask = Async(EAsyncExecution::TaskGraph, [=]()
 		{
 			m_readMeshTask.Wait();
@@ -159,39 +158,34 @@ void FBXReader::PairMaterial()
 	}
 }
 
-void FBXReader::LinkMaterial(FModelMesh* pMesh)
+void FBXReader::LinkMaterial(TSharedPtr <FModelMesh> pMesh)
 {
 	if (m_pMaterialImport.IsValid())
 	{
 		int slotIndex = 0;
-		MatMap matMap = m_pMaterialImport->GetMaterialMap();
 		for (auto section : pMesh->SectionList)
 		{
 			int32 matID = section->Properties.MaterialSlot;
-			FModelMaterial* mat = matMap.Find(matID);
-			if (mat != nullptr)
-			{
-				section->Properties.MaterialSlot = slotIndex;
-				pMesh->MaterialList.Add(*mat);
-				slotIndex++;
+			TSharedPtr<FModelMaterial> mat = m_pMaterialImport->MaterialMap.FindRef(matID);
+			section->Properties.MaterialSlot = slotIndex;
+			pMesh->MaterialList.Add(mat);
+			slotIndex++;
 
-				flag++;
-				FString strMatName = mat->Name;
-				//进度广播
-				Async(EAsyncExecution::TaskGraphMainThread, [=]()
-					{
-						FString strInfo = TEXT("关联材质: ") + strMatName;
-						FRMIDelegates::OnImportProgressDelegate.Broadcast(1, flag,
-							m_pMaterialImport->MeshNodeCount, strInfo);
-					});
-
-			}
+			//进度广播
+			flag++;
+			FString strMatName = mat->Name;
+			Async(EAsyncExecution::TaskGraphMainThread, [=]()
+				{
+					FString strInfo = TEXT("关联材质: ") + strMatName;
+					FRMIDelegates::OnImportProgressDelegate.Broadcast(1, flag,
+						m_pMaterialImport->MeshNodeCount, strInfo);
+				});
 
 		}
 
 		for (auto cMesh : pMesh->Children)
 		{
-			LinkMaterial(cMesh.Get());
+			LinkMaterial(cMesh);
 		}
 	}
 }
@@ -201,7 +195,6 @@ void FBXReader::LinkAndMergeByMaterial()
 	m_pModelMesh->Children.Empty();
 	TMap<int32, TSharedPtr<FModelMesh, ESPMode::ThreadSafe>> MatMeshMap;
 	TArray<TSharedPtr<FRuntimeMeshSectionData>> meshMatsNap = m_pMeshImport->GetSections();
-	auto matMap = m_pMaterialImport->GetMaterialMap();
 	int sectionCount = meshMatsNap.Num();
 	bool isChunk = false;
 	int index = 0;
@@ -220,7 +213,7 @@ void FBXReader::LinkAndMergeByMaterial()
 			MatMeshMap.Add(matID, matMesh);
 		}
 		section->Properties.MaterialSlot = 0;
-		FModelMaterial* matPtr = matMap.Find(matID);
+		TSharedPtr<FModelMaterial> matPtr = m_pMaterialImport->MaterialMap.FindRef(matID);
 		if (matMesh->SectionList.Num() == 0)
 		{
 			if (matPtr != nullptr)
@@ -230,7 +223,7 @@ void FBXReader::LinkAndMergeByMaterial()
 				matMesh->Parent = m_pModelMesh;
 				matMesh->MeshName = matPtr->Name;
 				matMesh->SectionList.Add(section);
-				matMesh->MaterialList.Add(*matPtr);
+				matMesh->MaterialList.Add(matPtr);
 				m_pModelMesh->Children.Add(matMesh);
 				strMatName = matPtr->Name;
 			}
@@ -248,7 +241,7 @@ void FBXReader::LinkAndMergeByMaterial()
 				matMesh = MakeShared<FModelMesh, ESPMode::ThreadSafe>();
 				if (matPtr != nullptr)
 				{
-					matMesh->MaterialList.Add(*matPtr);
+					matMesh->MaterialList.Add(matPtr);
 					matMesh->MeshID = matID;
 					matMesh->ParentID = m_pModelMesh->MeshID;
 					matMesh->Parent = m_pModelMesh;

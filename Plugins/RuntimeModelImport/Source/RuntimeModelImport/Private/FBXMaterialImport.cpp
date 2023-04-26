@@ -27,21 +27,20 @@ void FBXMaterialImport::AddReferencedObjects(FReferenceCollector& Collector)
 	//Collector.AddReferencedObject(TransparentMat);
 }
 
-const MatMap FBXMaterialImport::LoadMaterial(FbxScene* scene, const FString& strPath)
+void FBXMaterialImport::LoadMaterial(FbxScene* scene, const FString& strPath)
 {
 	strFBxPath = strPath;
 	scene->GetMaterialCount();
 	FbxArray<FbxSurfaceMaterial*> matArray = FbxArray<FbxSurfaceMaterial*>();
 	scene->FillMaterialArray(matArray);
-
-	MaterialMap.Add(-1, FModelMaterial(-1, "Default Material"));
+	MaterialMap.Add(-1, MakeShared<FModelMaterial>(-1, "Default Material"));
 	int matSize = matArray.GetCount();
 	for (int i = 0; i < matSize; i++)
 	{
 		FbxSurfaceMaterial* fbxMat = matArray[i];
 		FString strMatName = UTF8_TO_TCHAR(fbxMat->GetName());
-		FModelMaterial rModelMat = readMaterial(fbxMat);
-		MaterialMap.Add(rModelMat.ID, rModelMat);
+		TSharedPtr<FModelMaterial> rModelMat = readMaterial(fbxMat);
+		MaterialMap.Add(rModelMat->ID, rModelMat);
 
 		FString strInfo = TEXT("创建材质：") + strMatName + "...";
 
@@ -50,31 +49,29 @@ const MatMap FBXMaterialImport::LoadMaterial(FbxScene* scene, const FString& str
 				FRMIDelegates::OnImportProgressDelegate.Broadcast(1, i, matSize, strInfo);
 			});
 	} 
-
-	return MaterialMap;
 }
 
-FModelMaterial FBXMaterialImport::readMaterial(FbxSurfaceMaterial* pSurfaceMaterial)
+TSharedPtr<FModelMaterial> FBXMaterialImport::readMaterial(FbxSurfaceMaterial* pSurfaceMaterial)
 {
 	//读取材质属性
 	int32 matUniqueID = pSurfaceMaterial->GetUniqueID();
 	FString strMatName = UTF8_TO_TCHAR(pSurfaceMaterial->GetName());
-	FModelMaterial runtimeMat = FModelMaterial(matUniqueID, strMatName);
+	TSharedPtr<FModelMaterial> runtimeMat = MakeShared<FModelMaterial>(matUniqueID, strMatName);
 	//判断是不是透明材质
-	runtimeMat.Opacity = isTransparent(pSurfaceMaterial);
-	runtimeMat.IsTransparent = runtimeMat.Opacity == 1.0 ? false : true;
+	runtimeMat->Opacity = isTransparent(pSurfaceMaterial);
+	runtimeMat->IsTransparent = runtimeMat->Opacity == 1.0 ? false : true;
 
 	static float depOffset = 0.01;
-	runtimeMat.DepthOffset = 0.01;
+	runtimeMat->DepthOffset = 0.01;
 	depOffset += 0.01;
 	readNumberProperty(runtimeMat, pSurfaceMaterial);
 
 	//因为异步和saveGame的原因，不要在sdk层读取和创建纹理，材质，
 	//直接读图片的byte数据，在到actor中创建TEXT("DiffuseColor")
 	
-	readTexture(FbxSurfaceMaterial::sDiffuse, pSurfaceMaterial, runtimeMat.DiffuseMap);
+	readTexture(FbxSurfaceMaterial::sDiffuse, pSurfaceMaterial, runtimeMat->DiffuseMap);
 	//Read贴图
-	readTexture(TEXT("NormalMap"), pSurfaceMaterial, runtimeMat.NormalMap);
+	//readTexture(TEXT("NormalMap"), pSurfaceMaterial, runtimeMat->NormalMap);
 
 	FbxString shaderType = "HLSL";
 	const FbxImplementation* pImplementation = GetImplementation(pSurfaceMaterial, FBXSDK_IMPLEMENTATION_HLSL);
@@ -255,16 +252,16 @@ FLinearColor FBXMaterialImport::readColorProperty(FString propertyName, FbxSurfa
 	return color;
 }
 
-void FBXMaterialImport::readNumberProperty(FModelMaterial& modelMat, FbxSurfaceMaterial* pSurfaceMaterial)
+void FBXMaterialImport::readNumberProperty(TSharedPtr<FModelMaterial> modelMat, FbxSurfaceMaterial* pSurfaceMaterial)
 {
 	FbxProperty prop = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
-	modelMat.DiffuseColor = ConvertToColor(prop);
+	modelMat->DiffuseColor = ConvertToColor(prop);
 	prop = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sDiffuseFactor);
-	modelMat.DiffuseFactor = ConvertToFloat(prop);
+	modelMat->DiffuseFactor = ConvertToFloat(prop);
 	prop = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sEmissive);
-	modelMat.EmissiveColor = ConvertToColor(prop);
+	modelMat->EmissiveColor = ConvertToColor(prop);
 	prop = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sEmissiveFactor);
-	modelMat.EmissiveFactor = ConvertToFloat(prop);
+	modelMat->EmissiveFactor = ConvertToFloat(prop);
 }
 
 void FBXMaterialImport::readShader(FbxSurfaceMaterial* pSurfaceMaterial, const FbxImplementation* pImplementation, FbxString& shaderType)

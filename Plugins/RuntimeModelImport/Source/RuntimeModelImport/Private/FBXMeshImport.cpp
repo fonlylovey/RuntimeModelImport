@@ -14,7 +14,7 @@ FBXMeshImport::~FBXMeshImport()
 	MeshList.Empty();
 }
 
-FModelMesh* FBXMeshImport::LoadMesh(FbxScene* scene)
+TSharedPtr<FModelMesh> FBXMeshImport::LoadMesh(FbxScene* scene)
 {
 	FbxNode* rootNode = scene->GetRootNode();
 	if (rootNode)
@@ -26,17 +26,17 @@ FModelMesh* FBXMeshImport::LoadMesh(FbxScene* scene)
 		//转中心轴 
 		//rootNode->ConvertPivotAnimationRecursive(NULL, FbxNode::EPivotSet::eDestinationPivot, 30);
 
-		m_pRootMesh = new FModelMesh(rootNode->GetUniqueID(), UTF8_TO_TCHAR(rootNode->GetName()));
+		m_pRootMesh = MakeShared<FModelMesh>(rootNode->GetUniqueID(), UTF8_TO_TCHAR(rootNode->GetName()));
+
 		m_pRootMesh->IsRoot = true;
 		MeshList.Add(m_pRootMesh);
 		traverseNode(rootNode, m_pRootMesh);
-		MatIndexSet.Num();
 		return m_pRootMesh;
 	}
 	return m_pRootMesh;
 }
 
-void FBXMeshImport::traverseNode(FbxNode* pNode, FModelMesh* pMesh)
+void FBXMeshImport::traverseNode(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh)
 {
 	if (pMesh == nullptr)
 		return;
@@ -89,11 +89,11 @@ void FBXMeshImport::traverseNode(FbxNode* pNode, FModelMesh* pMesh)
 		pMesh->Children.Add(pUMeshObj);
 		pUMeshObj->Parent = pMesh;
 		pUMeshObj->ParentID = pMesh->MeshID;
-		traverseNode(child, pUMeshObj.Get());
+		traverseNode(child, pUMeshObj);
 	}
 }
 
-void FBXMeshImport::readMesh(FbxNode* pNode, FModelMesh* pMesh)
+void FBXMeshImport::readMesh(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh)
 {
 	if (pNode == nullptr || pMesh == nullptr)
 		return;

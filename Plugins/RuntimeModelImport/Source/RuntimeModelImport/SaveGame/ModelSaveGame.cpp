@@ -14,16 +14,19 @@ FArchive& operator<<(FArchive& Ar, FMeshData& material)
 
 void UModelSaveGame::SaveToFile()
 {
-	TArray<uint8> ObjectBytes;
-	FMemoryWriter MemoryWriter(ObjectBytes, true);
-
+	TArray64<uint8> ObjectBytes;
+	//FMemoryWriter MemoryWriter(ObjectBytes, true);
+	FLargeMemoryWriter Ar;
 	FString SaveGameClassName = GetClass()->GetName();
-	MemoryWriter << SaveGameClassName;
+	Ar << SaveGameClassName;
 
-	FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, false);
+	//FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, false);
 	Serialize(Ar);
+	uint8* ArchiveData = Ar.GetData();
+	int64 ArchiveSize = Ar.TotalSize();
+	TArray64<uint8> Buffer(ArchiveData, ArchiveSize);
 	FString strFilePath = FileDir + "_" + FString::FromInt(ChunkID) + TEXT(".mesh");
-	FFileHelper::SaveArrayToFile(ObjectBytes, *strFilePath);
+	FFileHelper::SaveArrayToFile(Buffer, *strFilePath);
 }
 
 FMeshData::FMeshData(FModelMesh* pMesh)
@@ -33,19 +36,28 @@ FMeshData::FMeshData(FModelMesh* pMesh)
 	MeshName = pMesh->MeshName;
 	ParentID = pMesh->ParentID;
 	Transform = pMesh->MeshMatrix;
-	for (auto section : pMesh->SectionList)
+	for (TSharedPtr<FRuntimeMeshSectionData> section : pMesh->SectionList)
 	{
 		PropertyList.Add(section->Properties);
 		RenderableList.Add(section->MeshData);
 	}
-	
-	MateritalList = pMesh->MaterialList;
 
+	for (TSharedPtr<FModelMaterial> matPtr : pMesh->MaterialList)
+	{
+		MateritalList.Add(*matPtr);
+	}
 }
 
-FModelMesh* FMeshData::ToModelMesh()
+FMeshData::~FMeshData()
 {
-	FModelMesh* modelMesh = new FModelMesh();
+	PropertyList.Empty();
+	RenderableList.Empty();
+	MateritalList.Empty();
+}
+
+TSharedPtr<FModelMesh> FMeshData::ToModelMesh()
+{
+	TSharedPtr<FModelMesh> modelMesh = MakeShared<FModelMesh>();
 	modelMesh->MeshID = MeshID;
 	modelMesh->MeshGUID = MeshGUID;
 	modelMesh->MeshName = MeshName;
@@ -58,7 +70,12 @@ FModelMesh* FMeshData::ToModelMesh()
 		section.MeshData = RenderableList[i];
 		section.Properties = PropertyList[i];
 		modelMesh->SectionList.Add(MakeShared<FRuntimeMeshSectionData>(section));
-		modelMesh->MaterialList = MateritalList;
 	}
+
+	for (FModelMaterial MatRef : MateritalList)
+	{
+		modelMesh->MaterialList.Add(MakeShared<FModelMaterial>(MatRef));
+	}
+
 	return modelMesh;
 }

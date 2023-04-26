@@ -6,10 +6,13 @@
 #include "CoreMinimal.h"
 #include "RuntimeMeshRenderable.h"
 #include "ModelMaterial.h"
+#include "ModelMesh.generated.h"
 
-
-struct RUNTIMEMODELIMPORT_API FModelMesh : public TSharedFromThis<FModelMesh, ESPMode::ThreadSafe>
+USTRUCT(BlueprintType)
+struct RUNTIMEMODELIMPORT_API FModelMesh
 {
+	GENERATED_BODY()
+public:
 	FModelMesh();
 	FModelMesh(const FModelMesh&) = default;
 	FModelMesh(int32 ID, FString strName);
@@ -32,7 +35,7 @@ struct RUNTIMEMODELIMPORT_API FModelMesh : public TSharedFromThis<FModelMesh, ES
 	//父ID
 	int32 ParentID;
 
-	FModelMesh* Parent;
+	TSharedPtr<FModelMesh> Parent;
 
 	//标识是否根节点
 	bool IsRoot;
@@ -46,9 +49,10 @@ struct RUNTIMEMODELIMPORT_API FModelMesh : public TSharedFromThis<FModelMesh, ES
 	//转换成RuntimeMesh的Data
 	TArray< TSharedPtr<FRuntimeMeshSectionData>> SectionList;
 
-	//材质槽数组, 同样也需要释放
-	//TArray< TSharedPtr<FRuntimeMeshMaterialSlot>> MaterialSlotList;
+	//材质数据
+	TArray<TSharedPtr<FModelMaterial>> MaterialList;
 
-	TArray<FModelMaterial> MaterialList;
+	//UE的材质，创建Actor之后会将材质数据创建成UE的材质实例
+	TArray<UMaterialInstanceDynamic*> DynamicMaterialList;
 
 };

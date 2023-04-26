@@ -37,7 +37,7 @@ private:
 	void PairMaterial();
 
 	//关联材质不做任何处理
-	void LinkMaterial(FModelMesh* pMesh);
+	void LinkMaterial(TSharedPtr <FModelMesh> pMesh);
 
 	//关联材质，并且按材质合并Mesh
 	void LinkAndMergeByMaterial();
@@ -52,7 +52,7 @@ private:
 	FImportOptions m_ImportOption;
 
 	int flag = 0;
-	FModelMesh* m_pModelMesh;
+	TSharedPtr <FModelMesh> m_pModelMesh;
 	TSharedPtr<FBXMeshImport> m_pMeshImport;
 	TSharedPtr<FBXMaterialImport> m_pMaterialImport;
 	TFuture<void> m_initTask;

@@ -26,7 +26,7 @@ public:
 
 	//给Actor设置渲染的Mesh数据
 	void SetModelMesh(TSharedPtr<FModelMesh> mesh);
-	FModelMesh* GetModelMesh() { return ModelMesh.Get(); };
+	TSharedPtr<FModelMesh> GetModelMesh() { return ModelMesh; };
 
 	void SetMaterialSlot(int32 MaterialSlot, FName SlotName, UMaterialInterface* InMaterial);
 
@@ -38,10 +38,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	ARuntimeActor* GetRootActor();
 
-	void Init(FModelMesh* mesh);
+	void Init(TSharedPtr<FModelMesh> mesh);
 
 	//异步的
-	void AsyncInit(FModelMesh* mesh);
+	void AsyncInit(TSharedPtr<FModelMesh> mesh);
 
 	FBoxSphereBounds GetBoundingSphere() { return BoundingSphere; };
 
@@ -49,11 +49,13 @@ public:
 	FString GUID;
 
 private:
-	void traverseMeshTree(FModelMesh* mesh, AActor* pParent);
+	void traverseMeshTree(TSharedPtr<FModelMesh> mesh, AActor* pParent);
 
 	void traverseActor(ARuntimeActor* rootActor);
 
-	UMaterialInterface* CreateMaterial(FModelMaterial& mat);
+	UMaterialInstanceDynamic* CreateMaterial(TSharedPtr<FModelMaterial> mat);
+
+	TSharedPtr<FModelMaterial> ConvertMaterial(UMaterialInstanceDynamic*);
 
 private:
 	int meshCount = 0;

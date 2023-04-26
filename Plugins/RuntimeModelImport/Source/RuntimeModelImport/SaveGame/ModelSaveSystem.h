@@ -11,7 +11,7 @@ class FModelSaveSystem
 	//GENERATED_BODY()
 public:
 	//保存文件到本地
-	void SaveToFile(const FString& proDir, FModelMesh* mesh);
+	void SaveToFile(const FString& proDir, TSharedPtr<FModelMesh> mesh);
 
 	void LoadByFile(const FString& proDir);
 
@@ -24,7 +24,7 @@ public:
 
 private:
 	//将ModelMesh对象转换成数据，并且计算内存给数据分块
-	void Traverse(FModelMesh* pMesh, TMap<int, TArray<FMeshData>>& chunkMap);
+	void Traverse(TSharedPtr<FModelMesh> pMesh);
 
 	UModelSaveGame* LoadMeshFile(const FString& filePath);
 
@@ -32,4 +32,7 @@ private:
 	static UE::Tasks::FPipe ModelSaveAsyncPipe;
 
 	FCriticalSection Mutex;
+
+	//分块后的数据
+	TMap<int, TArray<FMeshData>> ChunkMap;
 };

@@ -34,7 +34,7 @@ public:
 	*	Mesh树状结构算是处理完了, 可以去Spawn了.
 	*	参数1: 根节点
 	*/
-	DECLARE_MULTICAST_DELEGATE_OneParam(FOnMeshTreeBuildFinishDelegate, FModelMesh*);
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnMeshTreeBuildFinishDelegate, TSharedPtr<FModelMesh>);
 	static FOnMeshTreeBuildFinishDelegate OnMeshTreeBuildFinishDelegate;
 
 	/*
