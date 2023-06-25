@@ -2,10 +2,6 @@
 #include "OBJReader.h"
 #include "IFCReader.h"
 #include "FBXReader.h"
-#include <RMITypes.h>
-#include "Blueprint/UserWidget.h"
-#include "Components/ProgressBar.h"
-#include "Components/TextBlock.h"
 #include "RMIDelegates.h"
 #include "Engine/World.h"
 

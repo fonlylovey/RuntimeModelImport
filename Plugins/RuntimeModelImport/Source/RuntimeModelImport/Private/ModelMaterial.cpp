@@ -25,7 +25,7 @@ UTexture2D* FModelTexture::ToTexture(bool genMipmap)
 	if (texture != nullptr)
 	{
 		texture->AddToRoot();
-		texture->MipGenSettings = TMGS_Sharpen4;
+		//texture->MipGenSettings = TMGS_Sharpen4;
 		void* TextureData = texture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 		FMemory::Memcpy(TextureData, BulkData.GetData(), BulkData.Num());
 		texture->GetPlatformData()->Mips[0].BulkData.Unlock();

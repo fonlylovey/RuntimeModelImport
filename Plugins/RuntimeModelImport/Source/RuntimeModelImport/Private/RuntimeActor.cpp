@@ -129,7 +129,7 @@ void ARuntimeActor::Init(TSharedPtr<FModelMesh> mesh)
 		Async(EAsyncExecution::TaskGraphMainThread, [&]()
 			{
 				++readIndex;
-				FString strInfo = TEXT("生成Actor: " + mesh->MeshName);
+				FString strInfo = TEXT("生成Actor: ");
 				FRMIDelegates::OnImportProgressDelegate.Broadcast(1, readIndex, meshCount, MoveTemp(strInfo));
 
 				if (readIndex >= meshCount)
