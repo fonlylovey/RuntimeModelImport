@@ -244,8 +244,7 @@ UModelSaveGame* FModelSaveSystem::LoadMeshFile(const FString& filePath)
 		USaveGame* saveGame = NewObject<USaveGame>(GetTransientPackage(), SaveGameClass);
 		if (saveGame != NULL)
 		{
-			FObjectAndNameAsStringProxyArchive Ar(MemoryReader, true);
-			saveGame->Serialize(Ar);
+			saveGame->Serialize(MemoryReader);
 		}
 		meshObj = Cast<UModelSaveGame>(saveGame);
 		meshObj->MeshUID = modelID;

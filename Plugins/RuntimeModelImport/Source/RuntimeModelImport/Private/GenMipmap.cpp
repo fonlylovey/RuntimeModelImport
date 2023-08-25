@@ -6,7 +6,7 @@ void FGenMipmap::Init(int32 InSizeX, int32 InSizeY, ETextureSourceFormat InForma
 	SizeY = InSizeY;
 	Format = InFormat;
 	int32 side = SizeX > SizeY ? SizeX : SizeY;
-	int numLevels = FMath::Log2(side);
+	int numLevels = FMath::Log2((float)side);
 	NumMips = numLevels + 1;
 	if(InData)
 	{

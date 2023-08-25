@@ -143,7 +143,7 @@ void FRuntimeMeshComponentSceneProxy::CreateMeshBatch(FMeshBatch& MeshBatch, con
 	FMaterialRenderProxy* MaterialRenderProxy = Material->GetRenderProxy();
 
 	MeshBatch.VertexFactory = &Section.Buffers->VertexFactory;
-	MeshBatch.Type = bWantsAdjacencyInfo ? PT_12_ControlPointPatchList : PT_TriangleList;
+	MeshBatch.Type = PT_TriangleList;
 	MeshBatch.CastShadow = Section.bCastsShadow;
 
 	MeshBatch.LODIndex = LODIndex;

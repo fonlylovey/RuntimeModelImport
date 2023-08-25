@@ -212,7 +212,7 @@ void FBXReader::LinkAndMergeByMaterial()
 			matMesh = MakeShared<FModelMesh, ESPMode::ThreadSafe>();
 			MatMeshMap.Add(matID, matMesh);
 		}
-		section->Properties.MaterialSlot = 0;
+		section->Properties.MaterialSlot = -1;
 		TSharedPtr<FModelMaterial> matPtr = m_pMaterialImport->MaterialMap.FindRef(matID);
 		if (matMesh->SectionList.Num() == 0)
 		{

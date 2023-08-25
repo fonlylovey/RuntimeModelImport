@@ -178,10 +178,7 @@ void FBXMeshImport::readMesh(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh)
 		{
 			//获取当前多边形所使用的材质索引[0, matCount]
 			const int matIndex = indexArray[i];
-			if(matIndex == 0)
-			{
-				int a = 0;
-			}
+			
 			//按照材质索引获取或者创建Section   pMesh->SectionList.Num() > matIndex
 			TSharedPtr<FRuntimeMeshSectionData> pSection = nullptr;
 			if (MatIndexSectionMap.Contains(matIndex))
@@ -198,7 +195,7 @@ void FBXMeshImport::readMesh(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh)
 				pMesh->SectionList.Add(pSection);
 				MatIndexSectionMap.Add(matIndex, pSection);
 				int32 maiID = -1;
-				if (matIndex < MatIndexArray.Num())
+				if (matIndex > 0 && matIndex < MatIndexArray.Num())
 				{
 					maiID = MatIndexArray[matIndex];
 				}

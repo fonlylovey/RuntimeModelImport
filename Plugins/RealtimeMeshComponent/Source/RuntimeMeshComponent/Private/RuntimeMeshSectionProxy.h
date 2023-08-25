@@ -188,7 +188,7 @@ struct FRuntimeMeshSectionProxy
 	void CreateMeshBatch(FMeshBatch& MeshBatch, bool bShouldCastShadow, bool bWantsAdjacencyInfo) const
 	{
 		MeshBatch.VertexFactory = &Buffers->VertexFactory;
-		MeshBatch.Type = bWantsAdjacencyInfo ? PT_12_ControlPointPatchList : PT_TriangleList;
+		MeshBatch.Type = PT_TriangleList;
 		
 		MeshBatch.CastShadow = bShouldCastShadow;
 	

@@ -7,7 +7,6 @@ public class RuntimeMeshComponentEditor : ModuleRules
 {
     public RuntimeMeshComponentEditor(ReadOnlyTargetRules rules) : base(rules)
     {
-        bEnforceIWYU = true;
         bLegacyPublicIncludePaths = false;
 
 #if UE_4_23_OR_LATER
