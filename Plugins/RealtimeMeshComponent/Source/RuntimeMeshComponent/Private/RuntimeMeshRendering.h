@@ -6,7 +6,6 @@
 #include "RuntimeMeshCore.h"
 #include "RuntimeMeshRenderable.h"
 #include "Containers/ResourceArray.h"
-#include "RHIResourceUpdates.h"
 
 class FRuntimeMeshVertexBuffer;
 class FRuntimeMeshIndexBuffer;

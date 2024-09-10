@@ -104,8 +104,8 @@ void ARuntimeActor::Init(TSharedPtr<FModelMesh> mesh)
 			section->Properties.UpdateFrequency = ERuntimeMeshUpdateFrequency::Average;
 
 			//URuntimeMeshModifierNormals::CalculateNormalsTangents(section->MeshData);
-			Provider->CreateSection(0, i, section->Properties, section->MeshData);
 
+			Provider->CreateSection(0, i, section->Properties, section->MeshData);
 			BoundingSphere = Provider->GetBounds();
 			ARuntimeActor* parent = Cast<ARuntimeActor>(GetOwner());
 			if (parent != nullptr)
