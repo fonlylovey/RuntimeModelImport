@@ -1,10 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-//¶ÁÈ¡µÄµ¥¸öFBXMesh×ª»»µ½ÎÒÃÇ×Ô¼ºµÄ½á¹¹ÉÏ
-//ÊÇÒ»¸öÊ÷×´µÄ½á¹¹
+//è¯»å–çš„å•ä¸ªFBXMeshè½¬æ¢åˆ°æˆ‘ä»¬è‡ªå·±çš„ç»“æ„ä¸Š
+//æ˜¯ä¸€ä¸ªæ ‘çŠ¶çš„ç»“æ„
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RuntimeMeshRenderable.h"
 #include "ModelMaterial.h"
 #include "ModelMesh.generated.h"
 
@@ -18,10 +17,10 @@ public:
 	FModelMesh(int32 ID, FString strName);
 	~FModelMesh();
 
-	//¸ù¾İ´«ÈëµÄFModelMeshÄÃµ½ChildrenµÄÊıÁ¿, bRecursion ÊÇ·ñµİ¹é
+	//æ ¹æ®ä¼ å…¥çš„FModelMeshæ‹¿åˆ°Childrençš„æ•°é‡, bRecursion æ˜¯å¦é€’å½’
 	int32 GetChildrenNum(bool bRecursion = false);
 
-	//×ÓMesh½á¹¹Ç¶Ì×/µ±°´²ÄÖÊºÏ²¢µÄÊ±ºòÒ²¿ÉÄÜÊÇÆ½ĞĞ½á¹¹
+	//å­Meshç»“æ„åµŒå¥—/å½“æŒ‰æè´¨åˆå¹¶çš„æ—¶å€™ä¹Ÿå¯èƒ½æ˜¯å¹³è¡Œç»“æ„
 	const TArray<TSharedPtr<FModelMesh, ESPMode::ThreadSafe>>& GetChildren() { return Children; }
 
 	//ID
@@ -32,27 +31,24 @@ public:
 
 	FString MeshGUID;
 
-	//¸¸ID
+	//çˆ¶ID
 	int32 ParentID;
 
 	TSharedPtr<FModelMesh> Parent;
 
-	//±êÊ¶ÊÇ·ñ¸ù½Úµã
+	//æ ‡è¯†æ˜¯å¦æ ¹èŠ‚ç‚¹
 	bool IsRoot;
 
-	//MeshµÄ×ø±êĞÅÏ¢
+	//Meshçš„åæ ‡ä¿¡æ¯
 	FTransform MeshMatrix;
 	
-	//×ÓMesh½á¹¹Ç¶Ì×/µ±°´²ÄÖÊºÏ²¢µÄÊ±ºòÒ²¿ÉÄÜÊÇÆ½ĞĞ½á¹¹
+	//å­Meshç»“æ„åµŒå¥—/å½“æŒ‰æè´¨åˆå¹¶çš„æ—¶å€™ä¹Ÿå¯èƒ½æ˜¯å¹³è¡Œç»“æ„
 	TArray<TSharedPtr<FModelMesh, ESPMode::ThreadSafe>> Children;
 
-	//×ª»»³ÉRuntimeMeshµÄData
-	TArray< TSharedPtr<FRuntimeMeshSectionData>> SectionList;
-
-	//²ÄÖÊÊı¾İ
+	//æè´¨æ•°æ®
 	TArray<TSharedPtr<FModelMaterial>> MaterialList;
 
-	//UEµÄ²ÄÖÊ£¬´´½¨ActorÖ®ºó»á½«²ÄÖÊÊı¾İ´´½¨³ÉUEµÄ²ÄÖÊÊµÀı
+	//UEçš„æè´¨ï¼Œåˆ›å»ºActorä¹‹åä¼šå°†æè´¨æ•°æ®åˆ›å»ºæˆUEçš„æè´¨å®ä¾‹
 	TArray<UMaterialInstanceDynamic*> DynamicMaterialList;
 
 };

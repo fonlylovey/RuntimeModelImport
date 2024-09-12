@@ -30,7 +30,6 @@ FModelMesh::~FModelMesh()
 	IsRoot = false;
 	MeshMatrix = FTransform::Identity;
 	Children.Empty();
-	SectionList.Empty();
 	MaterialList.Empty();
 	DynamicMaterialList.Empty();
 }

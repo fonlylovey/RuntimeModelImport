@@ -19,20 +19,20 @@ void UMainWindow::NativeConstruct()
 void UMainWindow::OnClickedImportModel(const FString& strPath)
 {
 	FImportOptions option;
-	Importer::LoadModel(strPath, option);
+	//Importer::LoadModel(strPath, option);
 }
 
 void UMainWindow::OnClickedSaveModel()
 {
 	TArray<AActor*> FoundActors; 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARuntimeActor::StaticClass(), FoundActors);
+	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARuntimeActor::StaticClass(), FoundActors);
 
 	for (AActor* pActor : FoundActors)
 	{
-		auto runtimeActor = Cast<ARuntimeActor>(pActor);
-		if (runtimeActor->GetIsRoot())
+		//auto runtimeActor = Cast<ARuntimeActor>(pActor);
+		//if (runtimeActor->GetIsRoot())
 		{
-			Importer::SaveModel(TEXT("E:/Test/"), runtimeActor);
+			//Importer::SaveModel(TEXT("E:/Test/"), runtimeActor);
 		}
 	}
 
@@ -40,7 +40,7 @@ void UMainWindow::OnClickedSaveModel()
 
 void UMainWindow::OnClickedLoadModel()
 {
-	Importer::LoadModel(TEXT("E:/Test/"));
+	//Importer::LoadModel(TEXT("E:/Test/"));
 }
 
 void UMainWindow::OnFinishImport(ARuntimeActor* actor)

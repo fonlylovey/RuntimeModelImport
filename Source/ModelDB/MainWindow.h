@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "RMIDelegates.h"
-#include "RuntimeActor.h"
 #include "ProgressProvider.h"
 #include "MainWindow.generated.h"
 

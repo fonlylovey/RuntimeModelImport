@@ -7,7 +7,6 @@
 #include "CoreMinimal.h"
 #include "Delegates/Delegate.h"
 #include "RMITypes.h"
-#include "RuntimeActor.h"
 
 class ARuntimeActor;
 struct FModelMesh;

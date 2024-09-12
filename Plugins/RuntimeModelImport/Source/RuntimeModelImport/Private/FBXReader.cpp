@@ -3,8 +3,7 @@
 #include <string>
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
-#include "FBX/2020.2/include/fbxsdk/core/fbxsystemunit.h"
-#include "RuntimeMeshRenderable.h"
+#include "core/fbxsystemunit.h"
 #include <RMIDelegates.h>
 #include "ModelOperator.h"
 #include <assert.h>
@@ -95,7 +94,7 @@ FModelMesh* FBXReader::ReadFile(const FString& strPath, const FImportOptions& op
 	//初始化FBXSDK，导入fbxscene
 	try
 	{
-		m_initTask = Async(EAsyncExecution::TaskGraph, [=]()
+		m_initTask = Async(EAsyncExecution::TaskGraph, [=, this]()
 			{
 				initFBXSDK();
 				//进行场景转换
@@ -108,21 +107,21 @@ FModelMesh* FBXReader::ReadFile(const FString& strPath, const FImportOptions& op
 	}
 	
 	//读取材质
-	m_readMatTask = Async(EAsyncExecution::TaskGraph, [=]()
+	m_readMatTask = Async(EAsyncExecution::TaskGraph, [=, this]()
 		{
 			m_initTask.Wait();
 			m_pMaterialImport->LoadMaterial(m_pFbxScene, strFileName);
 		});
 
 	//读取Mesh
-	m_readMeshTask = Async(EAsyncExecution::TaskGraph, [=]()
+	m_readMeshTask = Async(EAsyncExecution::TaskGraph, [=, this]()
 		{
 			m_readMatTask.Wait();
 			m_pModelMesh = m_pMeshImport->LoadMesh(m_pFbxScene);
 		});
 	
 	//关联材质
-	m_mergeMatTask = Async(EAsyncExecution::TaskGraph, [=]()
+	m_mergeMatTask = Async(EAsyncExecution::TaskGraph, [=, this]()
 		{
 			m_readMeshTask.Wait();
 			m_pMaterialImport->MeshNodeCount = m_pMeshImport->MeshNodeCount;
@@ -162,7 +161,7 @@ void FBXReader::LinkMaterial(TSharedPtr <FModelMesh> pMesh)
 {
 	if (m_pMaterialImport.IsValid())
 	{
-		int slotIndex = 0;
+		int slotIndex = 0;/*
 		for (auto section : pMesh->SectionList)
 		{
 			int32 matID = section->Properties.MaterialSlot;
@@ -182,7 +181,7 @@ void FBXReader::LinkMaterial(TSharedPtr <FModelMesh> pMesh)
 				});
 
 		}
-
+        */
 		for (auto cMesh : pMesh->Children)
 		{
 			LinkMaterial(cMesh);
@@ -193,6 +192,7 @@ void FBXReader::LinkMaterial(TSharedPtr <FModelMesh> pMesh)
 void FBXReader::LinkAndMergeByMaterial()
 {
 	m_pModelMesh->Children.Empty();
+    /*
 	TMap<int32, TSharedPtr<FModelMesh, ESPMode::ThreadSafe>> MatMeshMap;
 	TArray<TSharedPtr<FRuntimeMeshSectionData>> meshMatsNap = m_pMeshImport->GetSections();
 	int sectionCount = meshMatsNap.Num();
@@ -267,7 +267,7 @@ void FBXReader::LinkAndMergeByMaterial()
 			renderDataA.TexCoords.Append(renderDataB.TexCoords);
 			renderDataA.Tangents.Append(renderDataB.Tangents);
 		}
-
+        
 		//进度广播
 		Async(EAsyncExecution::TaskGraphMainThread, [=]()
 			{
@@ -276,6 +276,7 @@ void FBXReader::LinkAndMergeByMaterial()
 			});
 		index++;
 	}
+    */
 }
 
 bool FBXReader::FbxImportCallback(void* pArgs, float pPercentage, const char* pStatus)

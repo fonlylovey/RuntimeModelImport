@@ -1,6 +1,5 @@
 ﻿#include "FBXMeshImport.h"
 #include "../Public/RMIDelegates.h"
-#include "../Public/RuntimeActor.h"
 #include <ModelOperator.h>
 
 FBXMeshImport::FBXMeshImport()
@@ -10,7 +9,7 @@ FBXMeshImport::FBXMeshImport()
 
 FBXMeshImport::~FBXMeshImport()
 {
-	SectionList.Empty();
+	//SectionList.Empty();
 	MeshList.Empty();
 }
 
@@ -59,7 +58,7 @@ void FBXMeshImport::traverseNode(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh)
 			readMesh(pNode, pMesh);
 
 			//呼叫主线程去SpawnActor
-			Async(EAsyncExecution::TaskGraphMainThread, [=]()
+			Async(EAsyncExecution::TaskGraphMainThread, [=, this]()
 				{
 					FString strInfo = TEXT("读取模型几何数据-：") + sNodeName;
 					++readIndex;
@@ -170,8 +169,8 @@ void FBXMeshImport::readMesh(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh)
 
 		int meshVexIndex = 0;
 		//将Section的大小设置为材质数量的大小
-		pMesh->SectionList.Reset(matCount);
-
+		//pMesh->SectionList.Reset(matCount);
+        /*
 		TMap<int, TSharedPtr<FRuntimeMeshSectionData>> MatIndexSectionMap;
 		//挨个读取多边形
 		for (int i = 0; i < triangleCount; i++)
@@ -261,7 +260,7 @@ void FBXMeshImport::readMesh(FbxNode* pNode, TSharedPtr<FModelMesh> pMesh)
 				meshVexIndex++;
 			}
 
-		}
+		}*/
 	}
 }
 

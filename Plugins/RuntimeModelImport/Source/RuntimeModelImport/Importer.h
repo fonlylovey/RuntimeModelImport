@@ -3,7 +3,6 @@
  */
 #pragma once
 #include "CoreMinimal.h"
-#include "RuntimeActor.h"
 #include "ReaderInterface.h"
 
 
@@ -13,12 +12,12 @@ extern RUNTIMEMODELIMPORT_API bool GRMIStartToLevelMap;
 namespace Importer
 {
 	// load fbx model
-	extern RUNTIMEMODELIMPORT_API ARuntimeActor* LoadModel(const FString& strPath, const FImportOptions& options);
+	//extern RUNTIMEMODELIMPORT_API ARuntimeActor* LoadModel(const FString& strPath, const FImportOptions& options);
 	
 	//保存Actor到本地
-	extern RUNTIMEMODELIMPORT_API void SaveModel(const FString& saveDir, ARuntimeActor* actor);
+	//extern RUNTIMEMODELIMPORT_API void SaveModel(const FString& saveDir, ARuntimeActor* actor);
 
 	//load 目录下的所有模型
-	extern RUNTIMEMODELIMPORT_API TArray<ARuntimeActor*> LoadModel(const FString& saveDir);
+	//extern RUNTIMEMODELIMPORT_API TArray<ARuntimeActor*> LoadModel(const FString& saveDir);
 
 }

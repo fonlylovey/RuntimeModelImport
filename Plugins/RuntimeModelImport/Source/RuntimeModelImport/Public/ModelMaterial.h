@@ -4,7 +4,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RuntimeMeshRenderable.h"
 #include "UObject/ObjectMacros.h"
 #include "Engine/Texture2D.h"
 #include "Engine/Texture.h"

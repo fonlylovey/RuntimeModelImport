@@ -8,8 +8,7 @@ public class ModelDBEditorTarget : TargetRules
 	public ModelDBEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
+		DefaultBuildSettings = BuildSettingsVersion.V4;
 		ExtraModuleNames.Add("ModelDB");
 	}
 }

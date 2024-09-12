@@ -14,6 +14,7 @@ public:
 	virtual ~FBXMaterialImport();
 
 	virtual void AddReferencedObjects(FReferenceCollector& Collector);
+    virtual FString GetReferencerName() const;
 
 	void LoadMaterial(FbxScene* scene, const FString& strPath);
 

@@ -27,6 +27,11 @@ void FBXMaterialImport::AddReferencedObjects(FReferenceCollector& Collector)
 	//Collector.AddReferencedObject(TransparentMat);
 }
 
+FString FBXMaterialImport::GetReferencerName() const
+{
+    return FString();
+}
+
 void FBXMaterialImport::LoadMaterial(FbxScene* scene, const FString& strPath)
 {
 	strFBxPath = strPath;

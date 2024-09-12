@@ -4,7 +4,7 @@
 
 //Àë¿ªµØÍ¼
 bool GRMIStartToLevelMap = false;
-
+/*
 ARuntimeActor* Importer::LoadModel(const FString& strPath, const FImportOptions& options)
 {
 	return FModelOperator::Instance()->ReadModelFile(strPath, options);
@@ -20,4 +20,4 @@ void Importer::SaveModel(const FString& saveDir, ARuntimeActor* actor)
 	FModelOperator::Instance()->LoadModel(saveDir);
 	return {};
 }
-
+*/

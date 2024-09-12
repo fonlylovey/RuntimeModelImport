@@ -7,11 +7,11 @@
 
 FModelOperator* FModelOperator::s_pSelf = nullptr;
 
-FModelOperator::FOnSpawnCompleteDelegate FModelOperator::OnSpawnComplete;
+//FModelOperator::FOnSpawnCompleteDelegate FModelOperator::OnSpawnComplete;
 
 FModelOperator::FModelOperator()
 {
-	m_pSaveModelPtr = MakeShared<FModelSaveSystem>();
+	//m_pSaveModelPtr = MakeShared<FModelSaveSystem>();
 	//监听Mesh树状结构完成
 	FRMIDelegates::OnMeshTreeBuildFinishDelegate.Clear();
 	FRMIDelegates::OnMeshTreeBuildFinishDelegate.AddRaw(this, &FModelOperator::OnMeshTreeBuildFinishDelegateListen);
@@ -19,9 +19,9 @@ FModelOperator::FModelOperator()
 
 FModelOperator::~FModelOperator()
 {
-	m_pSaveModelPtr = nullptr;
+	//m_pSaveModelPtr = nullptr;
 }
-
+/*
 ARuntimeActor* FModelOperator::ReadModelFile(const FString& strPath, const FImportOptions& options)
 {
 	m_pModelActor = nullptr;
@@ -84,7 +84,7 @@ void FModelOperator::LoadModel(const FString& fileDir)
 	m_pSaveModelPtr->LoadByFile(fileDir);
 	
 }
-
+*/
 TSharedPtr<IReaderInterface> FModelOperator::CreateReader(const FString& fileSuffix)
 {
 	TSharedPtr<IReaderInterface> reader = nullptr;
@@ -125,8 +125,8 @@ void FModelOperator::OnMeshTreeBuildFinishDelegateListen(TSharedPtr<FModelMesh> 
 	m_pReader.Reset();
 	m_pReader = nullptr;
 	pRoot->MeshGUID = FGuid::NewGuid().ToString();
-	m_pModelActor->SetModelMesh(pRoot);
-	m_pModelActor->GUID = pRoot->MeshGUID;
-	FRMIDelegates::OnImportCompleteDelegate.Broadcast(m_pModelActor);
+	//m_pModelActor->SetModelMesh(pRoot);
+	//m_pModelActor->GUID = pRoot->MeshGUID;
+	//FRMIDelegates::OnImportCompleteDelegate.Broadcast(m_pModelActor);
 	
 }

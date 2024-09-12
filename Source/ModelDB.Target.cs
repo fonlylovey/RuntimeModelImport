@@ -9,8 +9,7 @@ public class ModelDBTarget : TargetRules
 	{
         Type = TargetType.Game;
         LinkType = TargetLinkType.Monolithic;
-        DefaultBuildSettings = BuildSettingsVersion.V2;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
+        DefaultBuildSettings = BuildSettingsVersion.V4;
 		ExtraModuleNames.Add("ModelDB");
 	}
 }

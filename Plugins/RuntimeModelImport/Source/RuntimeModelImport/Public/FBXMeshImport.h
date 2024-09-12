@@ -13,7 +13,7 @@ public:
 
 	inline TArray<TSharedPtr<FModelMesh>> GetMeshList() { return MeshList; };
 
-	inline TArray<TSharedPtr<FRuntimeMeshSectionData>> GetSections() { return SectionList; };
+	//inline TArray<TSharedPtr<FRuntimeMeshSectionData>> GetSections() { return SectionList; };
 	
 	TSharedPtr<FModelMesh> m_pRootMesh;
 
@@ -71,7 +71,7 @@ private:
 	int readIndex = 0; //当前处理的节点index
 	int meshCount = 0;
 	FbxAMatrix globalMatrix;
-	TArray<TSharedPtr<FRuntimeMeshSectionData>> SectionList;
+	//TArray<TSharedPtr<FRuntimeMeshSectionData>> SectionList;
 	TArray<TSharedPtr<FModelMesh>> MeshList;
 	TArray<int32> MatIndexArray;
 };
