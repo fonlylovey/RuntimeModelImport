@@ -1,25 +1,29 @@
 ﻿#include "ModelOperator.h"
-#include "OBJReader.h"
-#include "IFCReader.h"
-#include "FBXReader.h"
+
+#include <functional>
+
+#include "OBJ/OBJReader.h"
+#include "IFC/IFCReader.h"
+#include "FBX/FBXReader.h"
+#include "STL/STLReader.h"
 #include "RMIDelegates.h"
 #include "Engine/World.h"
 
 FModelOperator* FModelOperator::s_pSelf = nullptr;
 
-//FModelOperator::FOnSpawnCompleteDelegate FModelOperator::OnSpawnComplete;
 
 FModelOperator::FModelOperator()
 {
-	//m_pSaveModelPtr = MakeShared<FModelSaveSystem>();
-	//监听Mesh树状结构完成
-	FRMIDelegates::OnMeshTreeBuildFinishDelegate.Clear();
-	FRMIDelegates::OnMeshTreeBuildFinishDelegate.AddRaw(this, &FModelOperator::OnMeshTreeBuildFinishDelegateListen);
+	if (!ThreadPool.IsValid())
+	{
+		ThreadPool = TUniquePtr<FQueuedThreadPool>(FQueuedThreadPool::Allocate());
+		ThreadPool->Create(4,  64 * 1024, TPri_Normal, TEXT("RuntimeModelImport"));
+	}
 }
 
 FModelOperator::~FModelOperator()
 {
-	//m_pSaveModelPtr = nullptr;
+	
 }
 /*
 ARuntimeActor* FModelOperator::ReadModelFile(const FString& strPath, const FImportOptions& options)
@@ -85,28 +89,38 @@ void FModelOperator::LoadModel(const FString& fileDir)
 	
 }
 */
-TSharedPtr<IReaderInterface> FModelOperator::CreateReader(const FString& fileSuffix)
+TSharedPtr<FReaderBase> FModelOperator::CreateReader(const FString& FilePath)
 {
-	TSharedPtr<IReaderInterface> reader = nullptr;
+	FString fileSuffix = GetSuffix(FilePath);
+	TSharedPtr<FReaderBase> reader = nullptr;
 	if (fileSuffix.Equals("fbx", ESearchCase::IgnoreCase))
 	{
-		reader = MakeShared<FBXReader>();
+		reader = MakeShared<FFBXReader>(FilePath);
 	}
 	else if(fileSuffix.Equals("obj", ESearchCase::IgnoreCase))
 	{
-		reader = MakeShared<OBJReader>();
+		reader = MakeShared<FOBJReader>(FilePath);
 	}
 	else if (fileSuffix.Equals("ifc", ESearchCase::IgnoreCase))
 	{
-		reader = MakeShared<IFCReader>();
+		reader = MakeShared<FIFCReader>(FilePath);
+	}
+	else if (fileSuffix.Equals("stl", ESearchCase::IgnoreCase))
+	{
+		reader = MakeShared<FSTLReader>(FilePath);
 	}
 	
 	return reader;
 }
 
-FString FModelOperator::GetSuffix(const FString& strPath)
+FString FModelOperator::GetSuffix(const FString& FilePath)
 {
-	return FPaths::GetExtension(strPath);
+	return FPaths::GetExtension(FilePath);
+}
+
+FQueuedThreadPool& FModelOperator::GetThreadPool()
+{
+	return *ThreadPool;
 }
 
 FModelOperator* FModelOperator::Instance()
@@ -118,15 +132,3 @@ FModelOperator* FModelOperator::Instance()
 	return s_pSelf;
 }
 
-void FModelOperator::OnMeshTreeBuildFinishDelegateListen(TSharedPtr<FModelMesh> pRoot)
-{
-	if (!pRoot)
-		return;
-	m_pReader.Reset();
-	m_pReader = nullptr;
-	pRoot->MeshGUID = FGuid::NewGuid().ToString();
-	//m_pModelActor->SetModelMesh(pRoot);
-	//m_pModelActor->GUID = pRoot->MeshGUID;
-	//FRMIDelegates::OnImportCompleteDelegate.Broadcast(m_pModelActor);
-	
-}

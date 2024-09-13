@@ -4,22 +4,27 @@
 #include "CoreMinimal.h"
 #include <Components/Button.h>
 #include <Components/ProgressBar.h>
+
+#include "ModelReader.h"
+#include "RuntimeDBLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Containers/Array.h"
-#include "../Importer.h"
 
 void UMainWindow::NativeConstruct()
 {
-	FRMIDelegates::OnImportCompleteDelegate.AddUObject(this, &UMainWindow::OnFinishImport);
-
 	m_pProvider = NewObject<UProgressProvider>();
 	m_pProvider->SetProgress(Progress_Import, TextBlock_Percent, TextBlock_Info);
 }
 
 void UMainWindow::OnClickedImportModel(const FString& strPath)
 {
-	FImportOptions option;
-	//Importer::LoadModel(strPath, option);
+	UModelReader* reader = URuntimeDBLibrary::MakeReader(strPath);
+	
+	FModelMesh* model = reader->ReadFile();
+	for (auto& item : model->Sections)
+	{
+		item->Vertexes;
+	}
 }
 
 void UMainWindow::OnClickedSaveModel()
@@ -43,7 +48,7 @@ void UMainWindow::OnClickedLoadModel()
 	//Importer::LoadModel(TEXT("E:/Test/"));
 }
 
-void UMainWindow::OnFinishImport(ARuntimeActor* actor)
+void UMainWindow::OnFinishImport(AActor* actor)
 {
 
 }

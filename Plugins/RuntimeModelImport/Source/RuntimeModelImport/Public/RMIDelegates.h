@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 /*
-*	´úÀí¶¨Òå
+*	ä»£ç†å®šä¹‰
 */
 #pragma once
 
@@ -8,66 +8,65 @@
 #include "Delegates/Delegate.h"
 #include "RMITypes.h"
 
-class ARuntimeActor;
 struct FModelMesh;
 class RUNTIMEMODELIMPORT_API FRMIDelegates
 {
 public:
 	/*
-	*	µÚÒ»²½
+	*	ç¬¬ä¸€æ­¥
 	*
-	*	Íâ²¿º¯ÊıÒ²¿ÉÒÔ¼àÌı¸Ã»Øµ÷, ±ÈÈç¼àÌıµ½Ö®ºó´´½¨Ò»¸ö×Ô¼ºµÄ½ø¶ÈÌõUI.
-	*	PS:Èç¹û²»ÏëÓÃ²å¼şµÄUI, ÒªÔÚImporter::LoadModel(const FString& strPath, bool bShowBuiltInProgress)·½·¨ÖĞ½«bShowBuiltInProgress´«ÖµÎªfalse.
+	*	å¤–éƒ¨å‡½æ•°ä¹Ÿå¯ä»¥ç›‘å¬è¯¥å›è°ƒ, æ¯”å¦‚ç›‘å¬åˆ°ä¹‹ååˆ›å»ºä¸€ä¸ªè‡ªå·±çš„è¿›åº¦æ¡UI.
+	*	PS:å¦‚æœä¸æƒ³ç”¨æ’ä»¶çš„UI, è¦åœ¨Importer::LoadModel(const FString& strPath, bool bShowBuiltInProgress)æ–¹æ³•ä¸­å°†bShowBuiltInProgressä¼ å€¼ä¸ºfalse.
 	*	
-	*	¿ªÊ¼¶ÁÈ¡
-	*	²ÎÊı1: ÎÄ¼şÃû
+	*	å¼€å§‹è¯»å–
+	*	å‚æ•°1: æ–‡ä»¶å
 	*/
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnImportStartDelegate, const FString&);
 	static FOnImportStartDelegate OnImportStartDelegate;
 
 	/*
-	*	µÚ¶ş²½
+	*	ç¬¬äºŒæ­¥
 	*
-	*	²å¼şÄÚ²¿ÓÃµÄ, Íâ²¿²»Òªµ÷ÓÃ
+	*	æ’ä»¶å†…éƒ¨ç”¨çš„, å¤–éƒ¨ä¸è¦è°ƒç”¨
 	*
-	*	MeshÊ÷×´½á¹¹ËãÊÇ´¦ÀíÍêÁË, ¿ÉÒÔÈ¥SpawnÁË.
-	*	²ÎÊı1: ¸ù½Úµã
+	*	Meshæ ‘çŠ¶ç»“æ„ç®—æ˜¯å¤„ç†å®Œäº†, å¯ä»¥å»Spawnäº†.
+	*	å‚æ•°1: æ ¹èŠ‚ç‚¹
 	*/
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnMeshTreeBuildFinishDelegate, TSharedPtr<FModelMesh>);
 	static FOnMeshTreeBuildFinishDelegate OnMeshTreeBuildFinishDelegate;
 
 	/*
-	*	µÚÈı²½
+	*	ç¬¬ä¸‰æ­¥
 	*
-	*	²å¼şÄÚ²¿ÓÃµÄ, Íâ²¿²»Òªµ÷ÓÃ
+	*	æ’ä»¶å†…éƒ¨ç”¨çš„, å¤–éƒ¨ä¸è¦è°ƒç”¨
 	*
-	*	SpawnActor½áÊø
-	*	²ÎÊı1: ¸ù½Úµã
+	*	SpawnActorç»“æŸ
+	*	å‚æ•°1: æ ¹èŠ‚ç‚¹
 	*/
 	DECLARE_MULTICAST_DELEGATE(FOnSpawnActorFinishDelegate);
 	static FOnSpawnActorFinishDelegate OnSpawnActorFinishDelegate;
 
 	/*
-	*	µ¼Èë¹ı³ÌÖĞ½ø¶ÈµÄ¸üĞÂ,·ÖÁ½²½,µÚÒ»²½¶ÁÈ¡Mesh, µÚ¶ş²½CreateSection.
+	*	å¯¼å…¥è¿‡ç¨‹ä¸­è¿›åº¦çš„æ›´æ–°,åˆ†ä¸¤æ­¥,ç¬¬ä¸€æ­¥è¯»å–Mesh, ç¬¬äºŒæ­¥CreateSection.
 	*
-	*	Íâ²¿º¯ÊıÒ²¿ÉÒÔ¼àÌı¸Ã»Øµ÷À´×ö×Ô¼ºµÄ½ø¶ÈUI, ¿É²Î¿¼FRMIProgress::UpdateProgressUIµÄÂß¼­. ERMIImportProgressStageÁ½¸öÃ¶¾Ù·Ö±ğÕ¼ÓÃ50%µÄ½ø¶È
+	*	å¤–éƒ¨å‡½æ•°ä¹Ÿå¯ä»¥ç›‘å¬è¯¥å›è°ƒæ¥åšè‡ªå·±çš„è¿›åº¦UI, å¯å‚è€ƒFRMIProgress::UpdateProgressUIçš„é€»è¾‘. ERMIImportProgressStageä¸¤ä¸ªæšä¸¾åˆ†åˆ«å ç”¨50%çš„è¿›åº¦
 	*	
-	*	²ÎÊı1 ERMIImportProgressStage:µ±Ç°ÊÇÊ²Ã´½×¶Î
-	*	²ÎÊı2 int32:µ±Ç°ÏÂ±ê
-	*	²ÎÊı3 int32:×ÜÊı
-	*	²ÎÊı4 const FString&:µ±Ç°½ÚµãMeshµÄÃû×Ö 
+	*	å‚æ•°1 ERMIImportProgressStage:å½“å‰æ˜¯ä»€ä¹ˆé˜¶æ®µ
+	*	å‚æ•°2 int32:å½“å‰ä¸‹æ ‡
+	*	å‚æ•°3 int32:æ€»æ•°
+	*	å‚æ•°4 const FString&:å½“å‰èŠ‚ç‚¹Meshçš„åå­— 
 	*/
 	DECLARE_MULTICAST_DELEGATE_FourParams(FOnImportProgressDelegate, int, int32, int32, const FString&);
 	static FOnImportProgressDelegate OnImportProgressDelegate;
 
 	/*
-	*	×îºóÒ»²½
+	*	æœ€åä¸€æ­¥
 	*
-	*	Íâ²¿º¯ÊıÒ²¿ÉÒÔ¼àÌı¸Ã»Øµ÷, ×ö¶ÁÈ¡Íê³ÉºóÄãÏëÒªÏÔÊ¾µÄGameplay
+	*	å¤–éƒ¨å‡½æ•°ä¹Ÿå¯ä»¥ç›‘å¬è¯¥å›è°ƒ, åšè¯»å–å®Œæˆåä½ æƒ³è¦æ˜¾ç¤ºçš„Gameplay
 	*	
-	*	½áÊø¶ÁÈ¡, Ò»¸öµ¼ÈëÁ÷³ÌÍê±Ï(¶Á+ÏÔÊ¾)
-	*	²ÎÊı1: ÎÄ¼şÃû
+	*	ç»“æŸè¯»å–, ä¸€ä¸ªå¯¼å…¥æµç¨‹å®Œæ¯•(è¯»+æ˜¾ç¤º)
+	*	å‚æ•°1: æ–‡ä»¶å
 	*/
-	DECLARE_MULTICAST_DELEGATE_OneParam(FOnImportCompleteDelegate, ARuntimeActor*);
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnImportCompleteDelegate, AActor*);
 	static FOnImportCompleteDelegate OnImportCompleteDelegate;
 };

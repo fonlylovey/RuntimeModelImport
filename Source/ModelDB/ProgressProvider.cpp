@@ -4,7 +4,6 @@
 #include "ProgressProvider.h"
 #include "MainWindow.h"
 #include <Components/Button.h>
-#include "../Importer.h"
 
 
 UProgressProvider::UProgressProvider()

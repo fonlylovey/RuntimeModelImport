@@ -1,48 +1,50 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 /*
-*	FBX ¶ÁÈ¡
-*	¶ÁÈ¡FBXÎÄ±¾·µ»ØFModeMesh
+*	FBX è¯»å–
+*	è¯»å–FBXæ–‡æœ¬è¿”å›FModeMesh
 */
 #pragma once
 #include "fbxsdk.h"
 #include "ModelMesh.h"
 #include "FBXMeshImport.h"
 #include "FBXMaterialImport.h"
-#include "ReaderInterface.h"
+#include "ReaderBase.h"
 
-class FBXReader : public IReaderInterface
+class FFBXReader : public FReaderBase
 {
 public:
-	FBXReader();
-	virtual ~FBXReader();
+	FFBXReader(const FString& FilePath);
+	FFBXReader(const FString& FilePath, const FImportOptions& Options);
+	
+	virtual ~FFBXReader();
 
-	//ÊµÏÖ½Ó¿ÚµÄº¯Êı, ´ËÊ±ÊÇÒì²½µÄ, ·µ»ØÖµ²»¿É¿¿. Í¨¹ı¼àÌıFRMIDelegates::OnMeshTreeBuildFinishDelegate()ÄÃµ½¶ÁÈ¡ÍêºóµÄ¸ù½Úµã
-	//·µ»ØÖµÕ¼Ê±Ã»ÓĞÒâÒå£¬ÒòÎªÒì²½£¬»á½«½á¹û¹ã²¥³öÈ¥
+	//å®ç°æ¥å£çš„å‡½æ•°, æ­¤æ—¶æ˜¯å¼‚æ­¥çš„, è¿”å›å€¼ä¸å¯é . é€šè¿‡ç›‘å¬FRMIDelegates::OnMeshTreeBuildFinishDelegate()æ‹¿åˆ°è¯»å–å®Œåçš„æ ¹èŠ‚ç‚¹
+	//è¿”å›å€¼å æ—¶æ²¡æœ‰æ„ä¹‰ï¼Œå› ä¸ºå¼‚æ­¥ï¼Œä¼šå°†ç»“æœå¹¿æ’­å‡ºå»
 	inline  FModelMesh* ReadFile(const FString& strPath);
 	FModelMesh* ReadFile(const FString& strPath, const FImportOptions& options);
 
 private:
 	void initFBXSDK();
 
-	//×ø±êÖá×ª»»(Î´Ğ´ÊµÏÖ´úÂë)+Ä£ĞÍµ¥Î»»¯³ÉĞé»ÃµÄÀåÃ×
+	//åæ ‡è½´è½¬æ¢(æœªå†™å®ç°ä»£ç )+æ¨¡å‹å•ä½åŒ–æˆè™šå¹»çš„å˜ç±³
 	void ConvertScene(FbxScene* pScene);
 
-	//¸øMesh¹ØÁª²ÄÖÊ
+	//ç»™Meshå…³è”æè´¨
 	//void ConncentMaterial(FModelMesh* pMesh, );
 
 	FString GetFileName();
 
 
-	//´¦Àí²ÄÖÊ, ºÏ²¢Ïà¹Ø´úÂëÔÚÕâ
+	//å¤„ç†æè´¨, åˆå¹¶ç›¸å…³ä»£ç åœ¨è¿™
 	void PairMaterial();
 
-	//¹ØÁª²ÄÖÊ²»×öÈÎºÎ´¦Àí
+	//å…³è”æè´¨ä¸åšä»»ä½•å¤„ç†
 	void LinkMaterial(TSharedPtr <FModelMesh> pMesh);
 
-	//¹ØÁª²ÄÖÊ£¬²¢ÇÒ°´²ÄÖÊºÏ²¢Mesh
+	//å…³è”æè´¨ï¼Œå¹¶ä¸”æŒ‰æè´¨åˆå¹¶Mesh
 	void LinkAndMergeByMaterial();
 
-	//fbximport µÄ»Øµ÷º¯Êı
+	//fbximport çš„å›è°ƒå‡½æ•°
 	static bool FbxImportCallback(void* pArgs, float pPercentage, const char* pStatus);
 
 private:

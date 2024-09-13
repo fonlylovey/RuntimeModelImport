@@ -3,50 +3,31 @@
  */
 #pragma once
 #include "CoreMinimal.h"
-#include "ReaderInterface.h"
+#include "ReaderBase.h"
 
-//ĞèÒª¸Ä³ÉÏß³Ì°²È«µÄÀà
+//éœ€è¦æ”¹æˆçº¿ç¨‹å®‰å…¨çš„ç±»
 class FModelOperator
 {
 public:
 	static FModelOperator* Instance();
+	
+	//æ ¹æ®æ–‡ä»¶æ ¼å¼åˆ›å»ºå®é™…çš„reader
+	TSharedPtr<FReaderBase> CreateReader(const FString& FilePath);
 
-	//ARuntimeActor* ReadModelFile(const FString& strPath, const FImportOptions& options = FImportOptions());
-
-	//±£´æActorµ½±¾µØ
-	//void SaveModel(const FString& saveDir, ARuntimeActor* actor);
-
-	//load Ä¿Â¼ÏÂµÄËùÓĞÄ£ĞÍ
-	void LoadModel(const FString& fileDir);
-
-	//ËùÓĞactor spawnÍê³É
-	//DECLARE_MULTICAST_DELEGATE_OneParam(FOnSpawnCompleteDelegate, TArray<ARuntimeActor*>);
-	//static FOnSpawnCompleteDelegate OnSpawnComplete;
-
+	FQueuedThreadPool& GetThreadPool();
+	
 private:
 	FModelOperator();
 	virtual ~FModelOperator();
 
-	//¸ù¾İÎÄ¼ş¸ñÊ½´´½¨Êµ¼ÊµÄreader
-	TSharedPtr<IReaderInterface> CreateReader(const FString& fileSuffix);
-
-	//»ñÈ¡ÎÄ¼şºó×ºÃû£¬²»°üº¬µã £¨xxxx.png·µ»Øpng£©
-	FString GetSuffix(const FString& strPath);
-
-	//¼àÌıMeshÊ÷×´½á¹¹Íê³É, Ä¿µÄÊÇÄÃµ½¸ù½ÚµãµÄFModelMesh*¶ÔÏó(ÒÑ¾­BuildºÃµÄ), ¿ÉÒÔÈ¥SpawnActorÁË
-	void OnMeshTreeBuildFinishDelegateListen(TSharedPtr<FModelMesh> pRoot);
+	//è·å–æ–‡ä»¶åç¼€åï¼Œä¸åŒ…å«ç‚¹ ï¼ˆxxxx.pngè¿”å›pngï¼‰
+	FString GetSuffix(const FString& FilePath);
 
 private:
 	static FModelOperator* s_pSelf;
 
-	TSharedPtr<IReaderInterface> m_pReader;
+	TMap<int, TSharedPtr<FReaderBase>> ReaderMap;
 
-	FImportOptions m_option;
-
-	//ARuntimeActor* m_pModelActor;
-
-	//TSharedPtr<FModelSaveSystem> m_pSaveModelPtr;
-
-	//TArray<ARuntimeActor*> ActorList;
+	TUniquePtr<FQueuedThreadPool> ThreadPool;
 };
 

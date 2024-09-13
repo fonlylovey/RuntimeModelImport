@@ -22,7 +22,7 @@ public class RuntimeModelImport : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				// ... add other private include paths required here ...
-                
+                "RuntimeModelImport"
 			}
 			);
 			
@@ -31,8 +31,7 @@ public class RuntimeModelImport : ModuleRules
 			new string[]
 			{
 				"Core",
-                "FBX",
-                "RealtimeMeshComponent",
+                "FBX"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -55,35 +54,5 @@ public class RuntimeModelImport : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
             );
-        /*
-        string FBXSDKDir = Target.UEThirdPartySourceDirectory + "FBX/2020.2/";
-        PublicSystemIncludePaths.AddRange(
-            new string[] {
-                    FBXSDKDir + "include",
-                    FBXSDKDir + "include/fbxsdk",
-                }
-            );
-        
-        string FBXDLLDir = Target.UEThirdPartyBinariesDirectory + "FBX/2020.2/";
-        if (Target.Platform == UnrealTargetPlatform.Win64)
-        {
-            string FBxLibPath = FBXSDKDir + "lib/vs2017/";
-            string FBxDllPath = FBXDLLDir + "Win64/libfbxsdk.dll";
-
-            FBxLibPath += "x64/release/";
-            PublicAdditionalLibraries.Add(FBxLibPath + "libfbxsdk.lib");
-
-            // We are using DLL versions of the FBX libraries
-            PublicDefinitions.Add("FBXSDK_SHARED");
-
-            RuntimeDependencies.Add("$(TargetOutputDir)/libfbxsdk.dll", FBxDllPath);
-
-            if (Target.LinkType != TargetLinkType.Monolithic)
-            {
-                
-            }
-          
-        }
-        */
     }
 }

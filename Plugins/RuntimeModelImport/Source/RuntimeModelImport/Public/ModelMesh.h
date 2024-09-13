@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "ModelMaterial.h"
+#include "ModelSection.h"
 #include "ModelMesh.generated.h"
 
 USTRUCT(BlueprintType)
@@ -36,6 +37,8 @@ public:
 
 	TSharedPtr<FModelMesh> Parent;
 
+	TArray<TSharedPtr<FModelSection, ESPMode::ThreadSafe>> Sections;
+	
 	//标识是否根节点
 	bool IsRoot;
 
@@ -47,8 +50,4 @@ public:
 
 	//材质数据
 	TArray<TSharedPtr<FModelMaterial>> MaterialList;
-
-	//UE的材质，创建Actor之后会将材质数据创建成UE的材质实例
-	TArray<UMaterialInstanceDynamic*> DynamicMaterialList;
-
 };

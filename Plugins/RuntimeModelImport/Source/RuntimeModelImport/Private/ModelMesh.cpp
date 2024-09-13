@@ -9,6 +9,9 @@ FModelMesh::FModelMesh()
 	, IsRoot(false)
 	, MeshMatrix(FVector::ZeroVector)
 {
+	Sections.Empty();
+	Children.Empty();
+	MaterialList.Empty();
 }
 
 FModelMesh::FModelMesh(int32 ID, FString strName)
@@ -19,6 +22,9 @@ FModelMesh::FModelMesh(int32 ID, FString strName)
 	, IsRoot(false)
 	, MeshMatrix(FVector::ZeroVector)
 {
+	Sections.Empty();
+	Children.Empty();
+	MaterialList.Empty();
 }
 
 FModelMesh::~FModelMesh()
@@ -31,7 +37,6 @@ FModelMesh::~FModelMesh()
 	MeshMatrix = FTransform::Identity;
 	Children.Empty();
 	MaterialList.Empty();
-	DynamicMaterialList.Empty();
 }
 
 int32 FModelMesh::GetChildrenNum(bool bRecursion /*= false*/)

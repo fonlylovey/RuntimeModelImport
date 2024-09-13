@@ -8,18 +8,21 @@
 #include "ModelOperator.h"
 #include <assert.h>
 
-FBXReader::FBXReader()
-	: m_strModelPath(FString(TEXT("")))
-	, SdkManager(nullptr)
-	, m_pFbxScene(nullptr)
-	, m_ImportOption(FImportOptions())
-	, m_pModelMesh(nullptr)
-	, m_pMeshImport(MakeShared<FBXMeshImport>())
-	, m_pMaterialImport(MakeShared<FBXMaterialImport>())
+FFBXReader::FFBXReader(const FString& FilePath)
+	: FReaderBase(FilePath),
+	SdkManager(nullptr),
+	m_pFbxScene(nullptr)
 {
 }
 
-FBXReader::~FBXReader()
+FFBXReader::FFBXReader(const FString& FilePath, const FImportOptions& Options)
+	: FReaderBase(FilePath, Options),
+	SdkManager(nullptr),
+	m_pFbxScene(nullptr)
+{
+}
+
+FFBXReader::~FFBXReader()
 {
 	if (SdkManager)
 	{
@@ -37,7 +40,7 @@ FBXReader::~FBXReader()
 	m_pMaterialImport = nullptr;
 }
 
-void FBXReader::initFBXSDK()
+void FFBXReader::initFBXSDK()
 {
 	if (!SdkManager)
 	{
@@ -80,12 +83,12 @@ void FBXReader::initFBXSDK()
 	}
 }
 
-FModelMesh* FBXReader::ReadFile(const FString& strPath)
+FModelMesh* FFBXReader::ReadFile(const FString& strPath)
 {
 	return ReadFile(strPath, FImportOptions());
 }
 
-FModelMesh* FBXReader::ReadFile(const FString& strPath, const FImportOptions& options)
+FModelMesh* FFBXReader::ReadFile(const FString& strPath, const FImportOptions& options)
 {
 	m_ImportOption = options;
 	m_strModelPath = strPath;
@@ -140,7 +143,7 @@ FModelMesh* FBXReader::ReadFile(const FString& strPath, const FImportOptions& op
 	return nullptr;
 }
 
-void FBXReader::PairMaterial()
+void FFBXReader::PairMaterial()
 {
 	flag = 0;
 	/**
@@ -157,7 +160,7 @@ void FBXReader::PairMaterial()
 	}
 }
 
-void FBXReader::LinkMaterial(TSharedPtr <FModelMesh> pMesh)
+void FFBXReader::LinkMaterial(TSharedPtr <FModelMesh> pMesh)
 {
 	if (m_pMaterialImport.IsValid())
 	{
@@ -189,7 +192,7 @@ void FBXReader::LinkMaterial(TSharedPtr <FModelMesh> pMesh)
 	}
 }
 
-void FBXReader::LinkAndMergeByMaterial()
+void FFBXReader::LinkAndMergeByMaterial()
 {
 	m_pModelMesh->Children.Empty();
     /*
@@ -279,7 +282,7 @@ void FBXReader::LinkAndMergeByMaterial()
     */
 }
 
-bool FBXReader::FbxImportCallback(void* pArgs, float pPercentage, const char* pStatus)
+bool FFBXReader::FbxImportCallback(void* pArgs, float pPercentage, const char* pStatus)
 {
 	FString strInfo = TEXT("加载模型文件...");
 
@@ -291,7 +294,7 @@ bool FBXReader::FbxImportCallback(void* pArgs, float pPercentage, const char* pS
 	return true;
 }
 
-void FBXReader::ConvertScene(FbxScene* pScene)
+void FFBXReader::ConvertScene(FbxScene* pScene)
 {
 	if (pScene)
 	{
@@ -319,7 +322,7 @@ void FBXReader::ConvertScene(FbxScene* pScene)
 	}
 }
 
-FString FBXReader::GetFileName()
+FString FFBXReader::GetFileName()
 {
 	
 	return FPaths::GetPath(m_strModelPath) + "\\" + FPaths::GetBaseFilename(m_strModelPath);
