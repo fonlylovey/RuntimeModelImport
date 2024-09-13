@@ -33,4 +33,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	URuntimeModelMeshComponent* Model;
+
+	FString strDefaultMat;
+	FString strTransparentMat;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* DefaultMat;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* TransparentMat;
 };

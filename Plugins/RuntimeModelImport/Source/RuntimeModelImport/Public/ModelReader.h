@@ -24,6 +24,9 @@ public:
 	void Init(const FString& FilePath);
 	
 	FModelMesh* ReadFile();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadModel();
 	
 	void AsyncBeginLoad();
 

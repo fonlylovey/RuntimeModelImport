@@ -31,7 +31,7 @@ public:
 
 
 	void OnFinishImport(AActor* actor);
-
+/*
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget))
 	UButton* Button_Import;
 
@@ -46,4 +46,5 @@ public:
 
 	UPROPERTY()
 	UProgressProvider* m_pProvider;
+	*/
 };

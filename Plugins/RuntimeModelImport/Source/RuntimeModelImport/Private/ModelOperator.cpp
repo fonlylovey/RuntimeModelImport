@@ -120,7 +120,7 @@ FString FModelOperator::GetSuffix(const FString& FilePath)
 
 FQueuedThreadPool& FModelOperator::GetThreadPool()
 {
-	return *ThreadPool;
+	return *ThreadPool; 
 }
 
 FModelOperator* FModelOperator::Instance()

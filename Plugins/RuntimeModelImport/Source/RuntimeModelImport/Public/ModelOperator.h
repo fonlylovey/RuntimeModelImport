@@ -4,6 +4,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "ReaderBase.h"
+#include "RuntimeModelActor.h"
 
 //需要改成线程安全的类
 class FModelOperator

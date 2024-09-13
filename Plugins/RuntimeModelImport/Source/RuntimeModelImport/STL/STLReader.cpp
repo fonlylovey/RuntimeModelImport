@@ -63,8 +63,8 @@ FModelMesh* FSTLReader::ReadFile(const FString& strPath, const FImportOptions& o
 		{
 			ReadAsciiSTL(file, modelMesh);
 		}
-		file->close();
 	}
+    file->close();
 	return modelMesh;
 }
 
@@ -75,17 +75,20 @@ void FSTLReader::ReadAsciiSTL(std::ifstream* File, FModelMesh* Model)
 
 void FSTLReader::ReadBinarySTL(std::ifstream* File, FModelMesh* &Model)
 {
-	File->ignore(80);
-	int faceCount;
-	File->read(reinterpret_cast<char*>(&faceCount), 4);
-	
+    char* fileInfo = new char(0);
+    File->read(fileInfo, 80);
+
+    int faceCount = 0;
+    File->read(reinterpret_cast<char*>(&faceCount), 4);
+  
 	Model->Sections.Empty(0);
 	TSharedPtr<FModelSection> section = MakeShared<FModelSection>();
 	Model->Sections.Add(section);
 	
 	float normalX = 0, normalY = 0, normalZ = 0;
 	float vertexX = 0, vertexY = 0, vertexZ = 0;
-	for (int i = 0; i < faceCount; i++)
+    
+	for (int i = 0; i <faceCount; i++)
 	{
 		//normal   12 byte
 		File->read(reinterpret_cast<char*>(&normalX), 4);
@@ -99,14 +102,16 @@ void FSTLReader::ReadBinarySTL(std::ifstream* File, FModelMesh* &Model)
 		File->read(reinterpret_cast<char*>(&vertexZ), 4);
 		section->Vertexes.Add(FVector(vertexX, vertexY, vertexZ));
 		section->BoundBox += FVector(normalX, normalY, normalZ);
-		
+        section->TexCoord0.Add(FVector2f(0, 0));
+
 		//vertex 2 12 byte
 		File->read(reinterpret_cast<char*>(&vertexX), 4);
 		File->read(reinterpret_cast<char*>(&vertexY), 4);
 		File->read(reinterpret_cast<char*>(&vertexZ), 4);
 		section->Vertexes.Add(FVector(vertexX, vertexY, vertexZ));
 		section->BoundBox += FVector(normalX, normalY, normalZ);
-		
+        section->TexCoord0.Add(FVector2f(0, 0));
+
 		//vertex 3 12 byte
 		File->read(reinterpret_cast<char*>(&vertexX), 4);
 		File->read(reinterpret_cast<char*>(&vertexY), 4);
@@ -130,6 +135,8 @@ bool FSTLReader::isBinaryFile(std::ifstream* file)
 	file->seekg(0, std::ios::end);
 	size_t fileSize = file->tellg();
 	int flag = (fileSize - 84) % 50;
+    //计算完需要将指针放置到文件头位置
+    file->seekg(0, std::ios::beg);
 	if ( flag == 0)
 	{
 		return true;

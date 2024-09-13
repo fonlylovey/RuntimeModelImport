@@ -25,6 +25,25 @@ FModelMesh* UModelReader::ReadFile()
 	return ReaderPrivate->ReadFile();
 }
 
+void UModelReader::LoadModel()
+{
+	FModelMesh* model = ReadFile();
+	if (model)
+	{
+		FActorSpawnParameters SpawnPara;
+		SpawnPara.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (GWorld)
+		{
+			FTransform trans;
+			trans.SetLocation(FVector(0, 0, 0));
+            //trans.SetScale3D(FVector(10000, 10000, 10000));
+			ARuntimeModelActor* runtimeActor = GWorld->SpawnActor<ARuntimeModelActor>(
+			ARuntimeModelActor::StaticClass(), trans, SpawnPara);
+			runtimeActor->Model->CreateMesh(model);
+		}
+	}
+}
+
 void UModelReader::AsyncBeginLoad()
 {
 	AsyncPool(FModelOperator::Instance()->GetThreadPool(),

@@ -9,22 +9,20 @@
 #include "RuntimeDBLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Containers/Array.h"
+#include "RuntimeModelActor.h"
 
 void UMainWindow::NativeConstruct()
 {
-	m_pProvider = NewObject<UProgressProvider>();
-	m_pProvider->SetProgress(Progress_Import, TextBlock_Percent, TextBlock_Info);
+	//m_pProvider = NewObject<UProgressProvider>();
+	//m_pProvider->SetProgress(Progress_Import, TextBlock_Percent, TextBlock_Info);
 }
 
 void UMainWindow::OnClickedImportModel(const FString& strPath)
 {
 	UModelReader* reader = URuntimeDBLibrary::MakeReader(strPath);
 	
-	FModelMesh* model = reader->ReadFile();
-	for (auto& item : model->Sections)
-	{
-		item->Vertexes;
-	}
+	
+	
 }
 
 void UMainWindow::OnClickedSaveModel()

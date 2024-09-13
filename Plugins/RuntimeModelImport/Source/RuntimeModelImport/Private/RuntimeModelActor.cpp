@@ -11,6 +11,13 @@ ARuntimeModelActor::ARuntimeModelActor()
 	PrimaryActorTick.bCanEverTick = true;
 	Model = CreateDefaultSubobject<URuntimeModelMeshComponent>(TEXT("Model"));
 	RootComponent = Model;
+	strDefaultMat = TEXT("/RuntimeModelImport/Materials/FBXMaterial.FBXMaterial");
+	strTransparentMat = TEXT("/RuntimeModelImport/Materials/FBXTransparent.FBXTransparent");
+
+	DefaultMat = Cast<UMaterialInterface>(StaticLoadObject(UMaterialInterface::StaticClass(), nullptr, *strDefaultMat));
+	TransparentMat = Cast<UMaterialInterface>(StaticLoadObject(UMaterialInterface::StaticClass(), nullptr, *strTransparentMat));
+	Model->SetMaterial(0, DefaultMat);
+	Model->SetMaterial(1, TransparentMat);
 }
 
 // Called when the game starts or when spawned

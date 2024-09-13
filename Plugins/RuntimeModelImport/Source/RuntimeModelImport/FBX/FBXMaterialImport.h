@@ -19,13 +19,13 @@ public:
 	void LoadMaterial(FbxScene* scene, const FString& strPath);
 
 	MatMap MaterialMap;
-	int MeshNodeCount = 0; //´øÓĞMeshµÄ½ÚµãÊıÁ¿
+	int MeshNodeCount = 0; //å¸¦æœ‰Meshçš„èŠ‚ç‚¹æ•°é‡
 
 private:
-	//²ÄÖÊÏµÍ³¶ÁÈ¡ ²ÄÖÊ·ÖÎª ÆÕÍ¨²ÄÖÊ¡¢ÎÆÀí¡¢shaderÈı²¿·Ö
+	//æè´¨ç³»ç»Ÿè¯»å– æè´¨åˆ†ä¸º æ™®é€šæè´¨ã€çº¹ç†ã€shaderä¸‰éƒ¨åˆ†
 	TSharedPtr<FModelMaterial> readMaterial(FbxSurfaceMaterial* pSurfaceMaterial);
 
-	//ÕâÀïº¯ÊıÄÚ²¿Ê¹ÓÃÒÆ¶¯ÓïÒå£¬²»ÒªÖ±½Ó·µ»ØÁÙÊ±¶ÔÏó
+	//è¿™é‡Œå‡½æ•°å†…éƒ¨ä½¿ç”¨ç§»åŠ¨è¯­ä¹‰ï¼Œä¸è¦ç›´æ¥è¿”å›ä¸´æ—¶å¯¹è±¡
 	bool readTexture(FString textureName, FbxSurfaceMaterial* pSurfaceMaterial, FModelTexture& byteData);
 
 	bool loadImage(FString strPath, FModelTexture& byteData);
@@ -37,10 +37,10 @@ private:
 
 	void readShader(FbxSurfaceMaterial* pSurfaceMaterial, const FbxImplementation* pImplementation, FbxString& shaderType);
 
-	//ÅĞ¶ÏÊÇ·ñÎªÍ¸Ã÷²ÄÖÊ Èç¹ûÊÇÍ¸Ã÷µÄÖ±¾¶·µ»ØÍ¸Ã÷µÄµÄÖµ£¬·ñÔò·µ»Ø0
+	//åˆ¤æ–­æ˜¯å¦ä¸ºé€æ˜æè´¨ å¦‚æœæ˜¯é€æ˜çš„ç›´å¾„è¿”å›é€æ˜çš„çš„å€¼ï¼Œå¦åˆ™è¿”å›0
 	float isTransparent(FbxSurfaceMaterial* pSurfaceMaterial);
 
-	//²é¿´ÊÇ·ñÊ¹ÓÃÓ²¼ş×ÅÉ«
+	//æŸ¥çœ‹æ˜¯å¦ä½¿ç”¨ç¡¬ä»¶ç€è‰²
 	const FbxImplementation* LoadImpl(FbxSurfaceMaterial* pMaterial);
 
 	FLinearColor ConvertToColor(FbxProperty prop);
@@ -50,8 +50,8 @@ private:
 
 
 private:
-	int readIndex = 0; //µ±Ç°´¦ÀíµÄ½Úµãindex
-	//²ÄÖÊID+²ÄÖÊÊµÀı
+	int readIndex = 0; //å½“å‰å¤„ç†çš„èŠ‚ç‚¹index
+	//æè´¨ID+æè´¨å®ä¾‹
 	FString strFBxPath;
 	FString strDefaultMat;
 	FString strTransparentMat;
