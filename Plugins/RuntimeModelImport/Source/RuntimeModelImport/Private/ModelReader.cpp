@@ -14,20 +14,16 @@ void UModelReader::Init(const FString& FilePath)
 {
 	ReaderPrivate = FModelOperator::Instance()->CreateReader(FilePath);
 	//
-	RuntimeDB::FOnLoadStartDelegate::FDelegate dele;
-	dele.BindUObject(this, &UModelReader::OnStartEvent);
-	OnStart.Add(dele);
-	ReaderPrivate->OnStartDelegate = dele;
+	//RuntimeDB::FOnLoadStartDelegate::FDelegate dele;
+	//dele.BindUObject(this, &UModelReader::OnStartEvent);
+	//OnStart.Add(dele);
+	//ReaderPrivate->OnStartDelegate = dele;
 }
 
-FModelMesh* UModelReader::ReadFile()
+void UModelReader::BeginLoad()
 {
-	return ReaderPrivate->ReadFile();
-}
-
-void UModelReader::LoadModel()
-{
-	FModelMesh* model = ReadFile();
+   
+    TSharedPtr<FModelMesh> model = ReaderPrivate->ReadFile();
 	if (model)
 	{
 		FActorSpawnParameters SpawnPara;

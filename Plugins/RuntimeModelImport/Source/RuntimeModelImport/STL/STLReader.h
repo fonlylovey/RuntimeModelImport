@@ -11,12 +11,12 @@ public:
 	FSTLReader(const FString& FilePath, const FImportOptions& Options);
 	virtual ~FSTLReader();
 	
-	virtual FModelMesh* ReadFile(const FString& strPath, const FImportOptions& options) override;
+    virtual TSharedPtr<FModelMesh> ReadFile(const FString& strPath, const FImportOptions& options) override;
 
 private:
-	void ReadAsciiSTL(std::ifstream* File, FModelMesh* Model);
+	void ReadAsciiSTL(std::ifstream* File, TSharedPtr<FModelMesh> Model);
 
-	void ReadBinarySTL(std::ifstream* File, FModelMesh* &Model);
+	void ReadBinarySTL(std::ifstream* File, TSharedPtr<FModelMesh> Model);
 
 	bool isBinaryFile(std::ifstream* File);
 

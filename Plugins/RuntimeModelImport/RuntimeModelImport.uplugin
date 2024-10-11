@@ -21,10 +21,10 @@
 			"LoadingPhase": "Default"
 		}
 	],
-  "Plugins": [
-		{
-			"Name": "RealtimeMeshComponent",
-			"Enabled": true
-		}
-  ]
+    "Plugins": [
+        {
+            "Name": "ProceduralMeshComponent",
+            "Enabled": true
+        }
+    ]
 }

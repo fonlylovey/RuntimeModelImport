@@ -20,8 +20,8 @@ public:
 
 	//实现接口的函数, 此时是异步的, 返回值不可靠. 通过监听FRMIDelegates::OnMeshTreeBuildFinishDelegate()拿到读取完后的根节点
 	//返回值占时没有意义，因为异步，会将结果广播出去
-	inline  FModelMesh* ReadFile(const FString& strPath);
-	FModelMesh* ReadFile(const FString& strPath, const FImportOptions& options);
+	inline  TSharedPtr<FModelMesh> ReadFile(const FString& strPath);
+	TSharedPtr<FModelMesh> ReadFile(const FString& strPath, const FImportOptions& options);
 
 private:
 	void initFBXSDK();
@@ -30,7 +30,7 @@ private:
 	void ConvertScene(FbxScene* pScene);
 
 	//给Mesh关联材质
-	//void ConncentMaterial(FModelMesh* pMesh, );
+	//void ConncentMaterial(TSharedPtr<FModelMesh> pMesh, );
 
 	FString GetFileName();
 

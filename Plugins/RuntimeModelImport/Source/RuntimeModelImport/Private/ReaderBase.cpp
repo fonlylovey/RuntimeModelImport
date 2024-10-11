@@ -20,12 +20,12 @@ FReaderBase::~FReaderBase()
 {
 }
 
-FModelMesh* FReaderBase::ReadFile()
+TSharedPtr<FModelMesh> FReaderBase::ReadFile()
 {
   return ReadFile(ModelFilePath);
 }
 
-FModelMesh* FReaderBase::ReadFile(const FString& FilePath)
+TSharedPtr<FModelMesh> FReaderBase::ReadFile(const FString& FilePath)
 {
   ModelFilePath = FilePath;
   FImportOptions Options;

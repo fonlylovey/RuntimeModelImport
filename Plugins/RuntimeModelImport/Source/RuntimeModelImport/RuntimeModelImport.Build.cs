@@ -31,7 +31,8 @@ public class RuntimeModelImport : ModuleRules
 			new string[]
 			{
 				"Core",
-                "FBX"
+                "FBX",
+                "ProceduralMeshComponent"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -43,6 +44,7 @@ public class RuntimeModelImport : ModuleRules
 				"Engine",
 				"Slate",
                 "SlateCore",
+                
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

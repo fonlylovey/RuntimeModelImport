@@ -17,11 +17,11 @@ public:
 
 	TArray<FVector> Vertexes;
 
-	TArray<uint32> Indexes;
+	TArray<int32> Indexes;
 
-	TArray<FVector3f> Normals;
+	TArray<FVector> Normals;
 
-	TArray<FVector2f> TexCoord0;
+	TArray<FVector2D> TexCoord0;
 
 	FBox BoundBox;
 	

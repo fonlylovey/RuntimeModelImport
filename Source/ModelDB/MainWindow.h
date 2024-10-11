@@ -19,9 +19,6 @@ class MODELDB_API UMainWindow : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
-	
-	UFUNCTION(BlueprintCallable)
-	void OnClickedImportModel(const FString& strPath);
 
 	UFUNCTION(BlueprintCallable)
 	void OnClickedSaveModel();

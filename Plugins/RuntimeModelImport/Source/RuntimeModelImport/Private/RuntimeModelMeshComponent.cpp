@@ -2,9 +2,10 @@
 
 #include "ModelMesh.h"
 
-URuntimeModelMeshComponent::URuntimeModelMeshComponent()
+URuntimeModelMeshComponent::URuntimeModelMeshComponent(const FObjectInitializer& ObjectInitializer)
+: Super(ObjectInitializer)
 {
-	
+	bUseComplexAsSimpleCollision = true;
 }
 
 URuntimeModelMeshComponent::~URuntimeModelMeshComponent()
@@ -16,7 +17,24 @@ void URuntimeModelMeshComponent::BeginDestroy()
 	Super::BeginDestroy();
 }
 
-void URuntimeModelMeshComponent::CreateMesh(FModelMesh* mesh)
+void URuntimeModelMeshComponent::CreateMesh(TSharedPtr<FModelMesh> mesh)
+{
+	int32 sectionIndex = 0;
+
+    TArray<FVector> normals;
+    TArray<FProcMeshTangent> tangents;
+    TArray<FVector2D> uvs;
+    TArray<FLinearColor> vertexColors;
+    vertexColors.Add(FLinearColor(1, 1, 1, 1));
+
+	for (const auto& section : mesh->Sections)
+	{
+		CreateMeshSection_LinearColor(sectionIndex, section->Vertexes, section->Indexes, section->Normals, section->TexCoord0, vertexColors, tangents, false);
+    }
+}
+
+/*
+void URuntimeModelMeshComponent::CreateMesh(TSharedPtr<FModelMesh> mesh)
 {
 	UStaticMesh* pStaticMesh = GetStaticMesh();
 	if (pStaticMesh != nullptr)
@@ -58,13 +76,13 @@ void URuntimeModelMeshComponent::CreateMesh(FModelMesh* mesh)
     	for (int32 i = 0; i < section->Vertexes.Num(); i++)
     	{
     		FStaticMeshBuildVertex vertex;
-    		vertex.Position = FVector3f(section->Vertexes[i] * 10000);
+    		vertex.Position = FVector3f(section->Vertexes[i] * 10);
     		vertex.UVs[0] = section->TexCoord0[i];
     		vertex.TangentX = FVector3f(1, 0, 0);
     		vertex.TangentY = FVector3f(0, 1, 0);
     		vertex.TangentZ = FVector3f(0, 0, 1);
     		vertexData.Add(vertex);
-            BoundingBox += FVector(section->Vertexes[i] * 10000);
+            BoundingBox += FVector(section->Vertexes[i] * 10);
     	}
 
     	TArray<uint32> indices;
@@ -93,3 +111,4 @@ void URuntimeModelMeshComponent::CreateMesh(FModelMesh* mesh)
     pStaticMesh->InitResources();
     pStaticMesh->CalculateExtendedBounds();
 }
+*/

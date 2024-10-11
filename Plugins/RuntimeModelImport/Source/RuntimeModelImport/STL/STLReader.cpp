@@ -44,10 +44,11 @@ FSTLReader::~FSTLReader()
 	
 }
 
-FModelMesh* FSTLReader::ReadFile(const FString& strPath, const FImportOptions& options)
+TSharedPtr<FModelMesh> FSTLReader::ReadFile(const FString& strPath, const FImportOptions& options)
 {
-	FModelMesh* modelMesh = new FModelMesh(0, "");
+    TSharedPtr<FModelMesh> modelMesh = MakeShared<FModelMesh>(0, "");
 	modelMesh->IsRoot = true;
+    
 	std::ifstream* file = new std::ifstream;
 	
 	//前80个字节是文件头，后4字节是文件面数
@@ -65,19 +66,20 @@ FModelMesh* FSTLReader::ReadFile(const FString& strPath, const FImportOptions& o
 		}
 	}
     file->close();
+    
 	return modelMesh;
 }
 
-void FSTLReader::ReadAsciiSTL(std::ifstream* File, FModelMesh* Model)
+void FSTLReader::ReadAsciiSTL(std::ifstream* File, TSharedPtr<FModelMesh> Model)
 {
 	
 }
 
-void FSTLReader::ReadBinarySTL(std::ifstream* File, FModelMesh* &Model)
+void FSTLReader::ReadBinarySTL(std::ifstream* File, TSharedPtr<FModelMesh> Model)
 {
-    char* fileInfo = new char(0);
+    char fileInfo[80];
     File->read(fileInfo, 80);
-
+    std::string str = fileInfo;
     int faceCount = 0;
     File->read(reinterpret_cast<char*>(&faceCount), 4);
   
@@ -94,7 +96,7 @@ void FSTLReader::ReadBinarySTL(std::ifstream* File, FModelMesh* &Model)
 		File->read(reinterpret_cast<char*>(&normalX), 4);
 		File->read(reinterpret_cast<char*>(&normalY), 4);
 		File->read(reinterpret_cast<char*>(&normalZ), 4);
-		section->Normals.Add(FVector3f(normalX, normalY, normalZ));
+		section->Normals.Add(FVector(normalX, normalY, normalZ));
 		
 		//vertex 1 12 byte
 		File->read(reinterpret_cast<char*>(&vertexX), 4);
@@ -102,7 +104,7 @@ void FSTLReader::ReadBinarySTL(std::ifstream* File, FModelMesh* &Model)
 		File->read(reinterpret_cast<char*>(&vertexZ), 4);
 		section->Vertexes.Add(FVector(vertexX, vertexY, vertexZ));
 		section->BoundBox += FVector(normalX, normalY, normalZ);
-        section->TexCoord0.Add(FVector2f(0, 0));
+        section->TexCoord0.Add(FVector2D(0, 0));
 
 		//vertex 2 12 byte
 		File->read(reinterpret_cast<char*>(&vertexX), 4);
@@ -110,7 +112,7 @@ void FSTLReader::ReadBinarySTL(std::ifstream* File, FModelMesh* &Model)
 		File->read(reinterpret_cast<char*>(&vertexZ), 4);
 		section->Vertexes.Add(FVector(vertexX, vertexY, vertexZ));
 		section->BoundBox += FVector(normalX, normalY, normalZ);
-        section->TexCoord0.Add(FVector2f(0, 0));
+        section->TexCoord0.Add(FVector2D(0, 0));
 
 		//vertex 3 12 byte
 		File->read(reinterpret_cast<char*>(&vertexX), 4);
@@ -119,7 +121,7 @@ void FSTLReader::ReadBinarySTL(std::ifstream* File, FModelMesh* &Model)
 		section->Vertexes.Add(FVector(vertexX, vertexY, vertexZ));
 		section->BoundBox += FVector(normalX, normalY, normalZ);
 
-		section->TexCoord0.Add(FVector2f(0, 0));
+		section->TexCoord0.Add(FVector2D(0, 0));
 		//attribute 2 byte
 		File->ignore(2);
 

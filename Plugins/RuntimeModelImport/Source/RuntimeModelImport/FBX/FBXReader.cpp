@@ -83,12 +83,12 @@ void FFBXReader::initFBXSDK()
 	}
 }
 
-FModelMesh* FFBXReader::ReadFile(const FString& strPath)
+TSharedPtr<FModelMesh> FFBXReader::ReadFile(const FString& strPath)
 {
 	return ReadFile(strPath, FImportOptions());
 }
 
-FModelMesh* FFBXReader::ReadFile(const FString& strPath, const FImportOptions& options)
+TSharedPtr<FModelMesh> FFBXReader::ReadFile(const FString& strPath, const FImportOptions& options)
 {
 	m_ImportOption = options;
 	m_strModelPath = strPath;

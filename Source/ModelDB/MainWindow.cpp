@@ -17,14 +17,6 @@ void UMainWindow::NativeConstruct()
 	//m_pProvider->SetProgress(Progress_Import, TextBlock_Percent, TextBlock_Info);
 }
 
-void UMainWindow::OnClickedImportModel(const FString& strPath)
-{
-	UModelReader* reader = URuntimeDBLibrary::MakeReader(strPath);
-	
-	
-	
-}
-
 void UMainWindow::OnClickedSaveModel()
 {
 	TArray<AActor*> FoundActors; 

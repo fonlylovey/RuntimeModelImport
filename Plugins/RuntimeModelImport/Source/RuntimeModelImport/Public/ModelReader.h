@@ -22,21 +22,22 @@ public:
 	virtual ~UModelReader();
 
 	void Init(const FString& FilePath);
-	
-	FModelMesh* ReadFile();
 
 	UFUNCTION(BlueprintCallable)
-	void LoadModel();
-	
+	void BeginLoad();
+
+	UFUNCTION(BlueprintCallable)
 	void AsyncBeginLoad();
 
+	UFUNCTION(BlueprintCallable)
 	void AsyncLoading();
-	
+
+	UFUNCTION(BlueprintCallable)
 	void AsyncFinishLoad();
 	
 private:
 	void OnStartEvent( const FString& info);
-
+	
 public:
 	RuntimeDB::FOnLoadStartDelegate OnStart;
 	

@@ -37,11 +37,11 @@ public:
 	FReaderBase(const FString& FilePath);
 	FReaderBase(const FString& FilePath, const FImportOptions& Options);
 	virtual ~FReaderBase();
-	//FModelMesh*, FRMIDelegates::OnMeshTreeBuildFinishDelegate()
-	//, FModelMesh* void.
-	virtual inline FModelMesh* ReadFile();
-	virtual inline FModelMesh* ReadFile(const FString& FilePath);
-	virtual FModelMesh* ReadFile(const FString& FilePath, const FImportOptions& Options) = 0;
+	//TSharedPtr<FModelMesh>, FRMIDelegates::OnMeshTreeBuildFinishDelegate()
+	//, TSharedPtr<FModelMesh> void.
+	virtual inline TSharedPtr<FModelMesh> ReadFile();
+	virtual inline TSharedPtr<FModelMesh> ReadFile(const FString& FilePath);
+	virtual TSharedPtr<FModelMesh> ReadFile(const FString& FilePath, const FImportOptions& Options) = 0;
 
 	
 	RuntimeDB::FOnLoadStartDelegate::FDelegate OnStartDelegate;

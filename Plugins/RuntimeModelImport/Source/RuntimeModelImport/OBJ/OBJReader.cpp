@@ -11,8 +11,8 @@ FOBJReader::FOBJReader(const FString& FilePath, const FImportOptions& Options)
 {
 }
 
-FModelMesh* FOBJReader::ReadFile(const FString& strPath, const FImportOptions& options)
+TSharedPtr<FModelMesh> FOBJReader::ReadFile(const FString& strPath, const FImportOptions& options)
 {
-	FModelMesh* modelMesh = new FModelMesh(0, "");
+	TSharedPtr<FModelMesh> modelMesh = MakeShared<FModelMesh>(0, "");
 	return modelMesh;
 }
